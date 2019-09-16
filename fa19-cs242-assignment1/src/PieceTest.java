@@ -3,16 +3,18 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.awt.Color;
-import java.io.File;
-import java.util.List;
-
-import org.junit.After;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 
 
 public class PieceTest {
+    protected Board testBoard = new Board("normal");
 
+    @Test
+    public void MoveTestStayAtCurrentPosition(){
+        testBoard.printBoard();
+        Piece testPawn = testBoard.getTiles()[1][0].getPiece();
+        System.out.println(testPawn.pieceToString());
+        assertFalse(testPawn.isValidMove(testBoard, testPawn.getRow(), testPawn.getCol()));
+    }
 }

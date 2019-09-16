@@ -32,8 +32,11 @@ public class Piece {
     public int getPlayerNumber(){
         return playerNumber;
     }
-    public String printPiece(){
+    public String pieceToString(){
         return "" + row + "," + col + " " + name + "-" + playerNumber;
+    }
+    public void printPiece(){
+        System.out.println(pieceToString());
     }
     /*
     public void setPlayerNumber(int playerNumber){
@@ -89,7 +92,7 @@ public class Piece {
         for (int increment = 1; increment < rowDiff; increment ++){
             Tile testTile = tiles[rowMin + increment][colMin + increment];
             if (testTile.isOccupied()){
-                System.out.println("Forbidden move: your diagonal movement is blocked by" + testTile.printTile());
+                System.out.println("Forbidden move: your diagonal movement is blocked by" + testTile.tileToString());
                 return false;
             }
         }
@@ -114,7 +117,7 @@ public class Piece {
             for (int increment = 1; increment < rowDiff; increment ++){
                 Tile testTile = tiles[minRow + increment][col];
                 if (testTile.isOccupied()){
-                    System.out.println("Forbidden move: horizontal movement is blocked by" + testTile.printTile());
+                    System.out.println("Forbidden move: horizontal movement is blocked by" + testTile.tileToString());
                     return false;
                 }
             }
@@ -124,7 +127,7 @@ public class Piece {
             for (int increment = 1; increment < colDiff; increment ++){
                 Tile testTile = tiles[row][minCol + increment];
                 if (testTile.isOccupied()){
-                    System.out.println("Forbidden move: vertical movement is blocked by" + testTile.printTile());
+                    System.out.println("Forbidden move: vertical movement is blocked by" + testTile.tileToString());
                     return false;
                 }
             }

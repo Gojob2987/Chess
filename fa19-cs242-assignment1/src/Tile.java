@@ -30,12 +30,16 @@ public class Tile {
         this.piece = piece;
     }
 
-    public String printTile(){
+    public String tileToString(){
         String result = row + "," + col;
         if (piece == null){
             return result;
         }
-        return result + " " + piece.getPieceName();
+        return result + " " + piece.getPieceName() + "-" + piece.getPlayerNumber();
+    }
+
+    public void printTile(){
+        System.out.println(tileToString());
     }
 
     public boolean isOccupied(){

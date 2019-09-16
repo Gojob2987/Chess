@@ -1,7 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 public class Board {
     private int width = 0;
@@ -60,7 +59,7 @@ public class Board {
 
     public void printPlayerPieces(List<Piece> playerPieces){
         for (Piece piece : playerPieces){
-            System.out.print(piece.printPiece() + " ");
+            System.out.print(piece.pieceToString() + " ");
         }
         System.out.println();
     }
@@ -72,7 +71,7 @@ public class Board {
         }
         for (int row = 0; row < width; row ++){
             for (int col = 0; col < height; col ++){
-                System.out.print(tiles[row][col].printTile() + " ");
+                System.out.print(tiles[row][col].tileToString() + " ");
             }
             System.out.println();
         }
