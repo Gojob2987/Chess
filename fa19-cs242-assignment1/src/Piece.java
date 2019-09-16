@@ -10,6 +10,7 @@ public class Piece {
         this.name = "General";
     }
 
+    /*==========================UTILITY FUNCTIONS=======================*/
     public int getRow(){
         return row;
     }
@@ -39,6 +40,11 @@ public class Piece {
         this.playerNumber = playerNumber;
     }
      */
+
+
+
+
+    /*=======================MOVEMENT LOGIC===========================*/
 
     /* generic tests for all pieces */
     public boolean isValidMove(Board board, int targetRow, int targetCol){

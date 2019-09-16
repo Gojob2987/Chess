@@ -21,6 +21,7 @@ public class Board {
             return;
         }
 
+    /*==========================UTILITY FUNCTIONS=======================*/
     }
     public int getWidth(){
         return width;
@@ -63,11 +64,21 @@ public class Board {
         }
         System.out.println();
     }
-    /*
-    public List getPieces(){
-        return pieces;
+
+    public void printBoard(){
+        if (tiles == null) {
+            System.out.println("board is not initialized, call one of the initBoard() functions first");
+            return;
+        }
+        for (int row = 0; row < width; row ++){
+            for (int col = 0; col < height; col ++){
+                System.out.print(tiles[row][col].printTile() + " ");
+            }
+            System.out.println();
+        }
     }
-     */
+
+    /*==========================NORMAL MODE INITIALIZATION=======================*/
 
     public void initBoardNormal() {
         setWidth(8);
@@ -132,6 +143,8 @@ public class Board {
         }
     }
 
+
+    /*==========================ENDGAME CHECK=======================*/
     public boolean isCheckmate(){
         if (playerTurn == 1){
             return isCheckmateToMyFoe(piecesPlayer1, piecesPlayer2);
@@ -154,6 +167,8 @@ public class Board {
         }
         return false;
     }
+
+    /*==========================HOW A SINGLE TURN IS DONE=======================*/
 
     public void movePiece(int currRow, int currCol, int targetRow, int targetCol){
         if (currRow < 0 || currRow > width || currCol < 0 || currCol > height){
@@ -192,17 +207,6 @@ public class Board {
     }
 
 
-    public void printBoard(){
-        if (tiles == null) {
-            System.out.println("board is not initialized, call one of the initBoard() functions first");
-            return;
-        }
-        for (int row = 0; row < width; row ++){
-            for (int col = 0; col < height; col ++){
-                System.out.print(tiles[row][col].printTile() + " ");
-            }
-            System.out.println();
-        }
-    }
+
 
 }

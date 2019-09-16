@@ -10,6 +10,7 @@ public class Tile {
         this.piece = piece;
     }
 
+    /*==========================UTILITY FUNCTIONS=======================*/
     public int getRow() {
         return row;
     }
@@ -41,6 +42,7 @@ public class Tile {
         return piece != null;
     }
 
+    /*========================CHANGE OF PIECE (MOVE IN / OUT)=======================*/
     public void moveIn(Board board, Piece visitor){
         if (this.piece.getPieceName() == "King"){
             board.setGameover();
