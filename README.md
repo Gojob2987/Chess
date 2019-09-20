@@ -2,7 +2,7 @@
 
 assignment1.0 (chess board & pieces)
 
--> assignment1.1 (polishing, automated documentation, GUI)
+-> assignment1.1 (polishing, automated documentation, custom pieces, GUI)
 
 https://wiki.illinois.edu/wiki/pages/viewpage.action?pageId=528356499
 	
