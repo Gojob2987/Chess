@@ -1,9 +1,13 @@
 # fa19-cs242-assignment1
 
 assignment1.0 (chess board & pieces)
+
 -> assignment1.1 (polishing, automated documentation, GUI)
-	https://wiki.illinois.edu/wiki/pages/viewpage.action?pageId=528356499
-	todo:	test cases
+
+https://wiki.illinois.edu/wiki/pages/viewpage.action?pageId=528356499
+	
+	todo:	
+		test cases
 		debug
 		unimplemented functionality (end game)
 		refactor(code smell elimination)
