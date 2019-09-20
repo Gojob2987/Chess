@@ -7,10 +7,10 @@ assignment1.0 (chess board & pieces)
 https://wiki.illinois.edu/wiki/pages/viewpage.action?pageId=528356499
 	
 	todo:	
-		 [x] create branch for assignment1.1
+	- [x] create branch for assignment1.1
 
-		 [ ] test cases
-		 [ ] debug
+	- [] test cases
+	- [ ] debug
 		 [ ] unimplemented functionality (end game)
 		 [ ] refactor(code smell elimination)
 		
