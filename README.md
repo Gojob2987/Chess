@@ -7,15 +7,17 @@ assignment1.0 (chess board & pieces)
 https://wiki.illinois.edu/wiki/pages/viewpage.action?pageId=528356499
 	
 	todo:	
-		test cases
-		debug
-		unimplemented functionality (end game)
-		refactor(code smell elimination)
+		 [x] create branch for assignment1.1
+
+		 [ ] test cases
+		 [ ] debug
+		 [ ] unimplemented functionality (end game)
+		 [ ] refactor(code smell elimination)
 		
-		generate documentation with doxygen
+		 [ ] generate documentation with doxygen
 
-		custom chess pieces x 2
+		 [ ] custom chess pieces x 2
 
-		static GUI
+		 [ ] static GUI
 		
 
