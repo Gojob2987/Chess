@@ -1,4 +1,17 @@
 # fa19-cs242-assignment1
-branch created
 
-assignment1 (chess board & pieces)
+assignment1.0 (chess board & pieces)
+-> assignment1.1 (polishing, automated documentation, GUI)
+	https://wiki.illinois.edu/wiki/pages/viewpage.action?pageId=528356499
+	todo:	test cases
+		debug
+		unimplemented functionality (end game)
+		refactor(code smell elimination)
+		
+		generate documentation with doxygen
+
+		custom chess pieces x 2
+
+		static GUI
+		
+
