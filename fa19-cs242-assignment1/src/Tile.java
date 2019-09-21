@@ -35,9 +35,20 @@ public class Tile {
     public String tileToString(){
         String result = row + "," + col;
         if (piece == null){
-            return result;
+            return tileToStringPadded(result);
         }
-        return result + " " + piece.getPieceName() + "-" + piece.getPlayerNumber();
+        result += " " + piece.getPieceName() + "-" + piece.getPlayerNumber();
+        return tileToStringPadded(result);
+    }
+
+    public String tileToStringPadded(String result){
+        String paddedString = result;
+        int length = "1,1 Bishop-0".length();
+        int currentLength = result.length();
+        for (int i = 0; i < length - currentLength; i ++){
+            paddedString += " ";
+        }
+        return paddedString;
     }
 
     public void printTile(){

@@ -50,26 +50,34 @@ public class Piece {
 
     /* Check test for all pieces (aka will this move result in me being inCheck) */
     public boolean isValidMove(Board board, int targetRow, int targetCol){
+        boolean printErrorMsg = board.getPrintErrorMsg();
+
         if (targetRow < 0 || targetRow >= board.getWidth() || targetCol < 0 || targetCol >= board.getHeight()){
-            /* System.out.println("Illegal move: out of board bound"); */
+            if (printErrorMsg){
+                System.out.println("Illegal move: out of board bound");
+            }
             return false;
         }
         if (row == targetRow && col == targetCol){
-            /* System.out.println("Illegal move: staying at current position"); */
+            if (printErrorMsg){
+                System.out.println("Illegal move: staying at current position");
+            }
             return false;
         }
 
-        Tile currTile = board.getTile(targetRow, targetCol);
-        Piece currPiece = currTile.getPiece();
         Tile targetTile = board.getTile(targetRow, targetCol);
         Piece targetPiece = targetTile.getPiece();
-        if (targetPiece != null && (currPiece.getPlayerNumber() == targetPiece.getPlayerNumber())){
-            /* System.out.println("Illegal move: you cant eat your own piece, at least shouldn't"); */
+        if (targetPiece != null && (playerNumber == targetPiece.getPlayerNumber())){
+            if (printErrorMsg) {
+                System.out.println("Illegal move: you cant eat your own piece, at least shouldn't");
+            }
             return false;
         }
 
         if (!isValidMoveAvoidingCheck(board, targetRow, targetCol)){
-            /* System.out.println("Illegal move: moving the piece will result in your king being in Check"); */
+            if (printErrorMsg){
+                System.out.println("Illegal move: moving the piece will result in your king being in Check");
+            }
             return false;
         }
 
@@ -77,6 +85,10 @@ public class Piece {
     }
 
     public boolean isValidMoveAvoidingCheck(Board board, int targetRow, int targetCol){
+        if (playerNumber != board.getPlayerTurn()){
+            return true; /* for this is not my turn, so wherever i move i wont get myself in check; i simply cant move */
+        }
+
         int currRow = row;
         int currCol = col;
         boolean result = true;
@@ -86,6 +98,7 @@ public class Piece {
 
         targetTile.moveIn(board, this);
         currTile.moveOut();
+
         if (board.isInCheck()){
             result = false;
         }
@@ -96,12 +109,15 @@ public class Piece {
 
     /* used in Piece.Bishop and Piece.Queen, and other long ranged unit moving diagonally*/
     public boolean isValidMoveDiagonal(Board board, int targetRow, int targetCol){
+        boolean printErrorMsg = board.getPrintErrorMsg();
 
         /* test is moving diagonally */
         int rowDiff = Math.abs(row - targetRow);
         int colDiff = Math.abs(col - targetCol);
         if (rowDiff != colDiff){
-            System.out.println("Forbidden move: movement is not purely diagonal");
+            if (printErrorMsg){
+                System.out.println("Forbidden move: movement is not purely diagonal");
+            }
             return false;
         }
 
@@ -113,7 +129,9 @@ public class Piece {
         for (int increment = 1; increment < rowDiff; increment ++){
             Tile testTile = tiles[rowMin + increment][colMin + increment];
             if (testTile.isOccupied()){
-                System.out.println("Forbidden move: your diagonal movement is blocked by" + testTile.tileToString());
+                if (printErrorMsg){
+                    System.out.println("Forbidden move: your diagonal movement is blocked by " + testTile.tileToString());
+                }
                 return false;
             }
         }
@@ -123,12 +141,15 @@ public class Piece {
 
     /* used in Piece.Rook and Piece.Queen, and other long ranged unit moving horizontally / vertically */
     public boolean isValidMoveHorizontalVertical(Board board, int targetRow, int targetCol){
+        boolean printErrorMsg = board.getPrintErrorMsg();
 
         /* test if moving only along one axis */
         int rowDiff = Math.abs(row - targetRow);
         int colDiff = Math.abs(col - targetCol);
         if (rowDiff * colDiff != 0){
-            System.out.println("Forbidden move: movement is not purely horizontal or vertical");
+            if (printErrorMsg) {
+                System.out.println("Forbidden move: movement is not purely horizontal or vertical");
+            }
             return false;
         }
         Tile[][] tiles = board.getTiles();
@@ -138,7 +159,9 @@ public class Piece {
             for (int increment = 1; increment < rowDiff; increment ++){
                 Tile testTile = tiles[minRow + increment][col];
                 if (testTile.isOccupied()){
-                    System.out.println("Forbidden move: horizontal movement is blocked by" + testTile.tileToString());
+                    if (printErrorMsg) {
+                        System.out.println("Forbidden move: horizontal movement is blocked by " + testTile.tileToString());
+                    }
                     return false;
                 }
             }
@@ -148,11 +171,14 @@ public class Piece {
             for (int increment = 1; increment < colDiff; increment ++){
                 Tile testTile = tiles[row][minCol + increment];
                 if (testTile.isOccupied()){
-                    System.out.println("Forbidden move: vertical movement is blocked by" + testTile.tileToString());
+                    if (printErrorMsg) {
+                        System.out.println("Forbidden move: vertical movement is blocked by" + testTile.tileToString());
+                    }
                     return false;
                 }
             }
         }
+
 
         return true;
     }
@@ -229,7 +255,7 @@ public class Piece {
 
         public Pawn (int row, int col, int playerNumber){
             super(row, col, playerNumber);
-            setPieceName("Piece.Pawn");
+            setPieceName("Pawn");
         }
 
         @Override
@@ -272,7 +298,7 @@ public class Piece {
     public static class Bishop extends Piece{
         public Bishop(int row, int col, int playerNumber){
             super(row, col, playerNumber);
-            setPieceName("Piece.Bishop");
+            setPieceName("Bishop");
         }
 
         @Override
@@ -292,7 +318,7 @@ public class Piece {
     public static class Rook extends Piece{
         public Rook(int row, int col, int playerNumber){
             super(row, col, playerNumber);
-            setPieceName("Piece.Rook");
+            setPieceName("Rook");
         }
 
         @Override
@@ -311,7 +337,7 @@ public class Piece {
     public static class King extends Piece{
         public King (int row, int col, int playerNumber){
             super(row, col, playerNumber);
-            setPieceName("Piece.King");
+            setPieceName("King");
         }
 
         @Override
@@ -348,7 +374,7 @@ public class Piece {
     public static class Queen extends Piece {
         public Queen(int row, int col, int playerNumber) {
             super(row, col, playerNumber);
-            setPieceName("Piece.Queen");
+            setPieceName("Queen");
         }
 
         @Override
@@ -368,7 +394,7 @@ public class Piece {
     public static class Knight extends Piece{
         public Knight (int row, int col, int playerNumber){
             super(row, col, playerNumber);
-            setPieceName("Piece.Knight");
+            setPieceName("Knight");
         }
 
         @Override

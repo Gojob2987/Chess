@@ -1,8 +1,3 @@
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import java.awt.Color;
 import java.io.File;
 import java.util.List;
@@ -11,12 +6,13 @@ import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-
-
-
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotEquals;
 
 
 public class BoardTest {
+    protected Board testBoard = new Board("normal");
+
 
     @Test
     public void testValidBoardConstructor1(){
@@ -42,8 +38,39 @@ public class BoardTest {
         testBoard.printPlayerPieces(piecesPlayer2);
     }
 
+
+
+
+
+
     @Test
-    public void testValidMovePiece(){
+    public void testMovePiece(){
+        testBoard.printBoard();
+        Piece testPawn0 = testBoard.getTile(1, 1).getPiece();
+        Piece testPawn1 = testBoard.getTile(6, 1).getPiece();
+
+        testBoard.movePiece(2, 1, 3, 1); /* this should print error message and return **/
+
+
+        testBoard.movePiece(testPawn0.getRow(), testPawn0.getCol(), testPawn0.getRow() + 2, testPawn0.getCol());
+        testBoard.printBoard();
+        assertNotEquals(testBoard.getPlayerTurn(), testPawn0.getPlayerNumber());
+
+
+        testBoard.movePiece(6, 1, 4, 1);
+        testBoard.printBoard();
+        assertNotEquals(testBoard.getPlayerTurn(), testPawn1.getPlayerNumber());
+
+
+        assertTrue(testPawn0.isValidMove(testBoard, 4, 1));
+        testBoard.movePiece(3, 1, 4, 1);
+        testBoard.printBoard();
+    }
+
+
+
+    public void testMovePieceCapture(){
+        testBoard.printBoard();
 
     }
 }

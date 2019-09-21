@@ -7,6 +7,8 @@ public class Board {
     private int height = 0;
     private static Tile[][] tiles;
     private static int playerTurn; /* this is used interchangeably with player name in various printing*/
+    private static int totalTurn;
+    private static boolean printErrorMsg = false;
     private static boolean gameover;
     private static List<Piece> player0Pieces;
     private static List<Piece> player1Pieces;
@@ -34,6 +36,10 @@ public class Board {
     public void setHeight(int height){
         this.height = height;
     }
+    public int getTotalTurn() {return totalTurn;}
+    public void setTotalTurn(int totalTurn) {this.totalTurn = totalTurn;}
+    public boolean getPrintErrorMsg() {return printErrorMsg;}
+    public void setPrintErrorMsg(boolean printErrorMsg) {this.printErrorMsg = printErrorMsg;}
     public Tile[][] getTiles(){
         return tiles;
     }
@@ -73,6 +79,7 @@ public class Board {
             System.out.println("board is not initialized, call one of the initBoard() functions first");
             return;
         }
+        System.out.println("Total Turns: " + totalTurn + "; Current Player Turn: " + playerTurn);
         for (int row = 0; row < width; row ++){
             for (int col = 0; col < height; col ++){
                 System.out.print(tiles[row][col].tileToString() + " ");
@@ -86,6 +93,7 @@ public class Board {
     public void initBoardNormal() {
         setWidth(8);
         setHeight(8);
+        setTotalTurn(0);
         initPlayerPiecesNormal();
         initTilesNormal();
         initPiecesNormal();
@@ -163,7 +171,7 @@ public class Board {
 
     private boolean amIBeingChecked(List<Piece> myPieces, List<Piece> enemyPieces){
         Piece myKing = myPieces.stream()
-                .filter(piece -> "Piece.King"
+                .filter(piece -> "King"
                         .equals(piece.getPieceName())).findAny().orElse(null);
 
         int targetRow = myKing.getRow();
@@ -221,6 +229,10 @@ public class Board {
             System.out.println("No piece at selected tile!");
             return;
         }
+        if (currPiece.getPlayerNumber() != playerTurn){
+            System.out.println("Current playerTurn is " + playerTurn + ", not " + currPiece.getPlayerNumber());
+            return;
+        }
 
         if (!currPiece.isValidMove(this, targetRow, targetCol)){
             return;
@@ -234,7 +246,9 @@ public class Board {
 
         /* change player turn */
         changePlayerTurn();
+        setTotalTurn(totalTurn + 1);
 
     }
+
 
 }
