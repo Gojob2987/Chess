@@ -50,7 +50,7 @@ public class Piece {
 
     /* Check test for all pieces (aka will this move result in me being inCheck) */
     public boolean isValidMove(Board board, int targetRow, int targetCol){
-        if (row < 0 || row > board.getWidth() || col < 0 || col > board.getHeight()){
+        if (targetRow < 0 || targetRow >= board.getWidth() || targetCol < 0 || targetCol >= board.getHeight()){
             /* System.out.println("Illegal move: out of board bound"); */
             return false;
         }
@@ -61,11 +61,6 @@ public class Piece {
 
         Tile currTile = board.getTile(targetRow, targetCol);
         Piece currPiece = currTile.getPiece();
-        if (currPiece == null){
-            /* System.out.println("Illegal move: no piece at currently selected location"); */
-            return false;
-        }
-
         Tile targetTile = board.getTile(targetRow, targetCol);
         Piece targetPiece = targetTile.getPiece();
         if (targetPiece != null && (currPiece.getPlayerNumber() == targetPiece.getPlayerNumber())){
@@ -84,6 +79,7 @@ public class Piece {
     public boolean isValidMoveAvoidingCheck(Board board, int targetRow, int targetCol){
         int currRow = row;
         int currCol = col;
+        boolean result = true;
         Tile currTile = board.getTile(currRow, currCol);
         Tile targetTile = board.getTile(targetRow, targetCol);
         Piece targetPiece = targetTile.getPiece();
@@ -91,10 +87,10 @@ public class Piece {
         targetTile.moveIn(board, this);
         currTile.moveOut();
         if (board.isInCheck()){
-            targetTile.moveBack(board, targetPiece, currRow, currCol);
-            return false;
+            result = false;
         }
-        return true;
+        targetTile.moveBack(board, targetPiece, currRow, currCol);
+        return result;
     }
 
 
@@ -262,6 +258,7 @@ public class Piece {
             if (col != targetCol){
                 valid = valid && (colDiff < 2);
             }
+
 
             return valid;
         }

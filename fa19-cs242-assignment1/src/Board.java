@@ -94,7 +94,7 @@ public class Board {
         /*printBoard();*/
     }
 
-    public void initPlayerPiecesNormal(){
+    private void initPlayerPiecesNormal(){
         player0Pieces = new ArrayList<>(16);
         player1Pieces = new ArrayList<>(16);
     }
@@ -216,6 +216,11 @@ public class Board {
         Tile currTile = tiles[currRow][currCol];
         Tile targetTile = tiles[targetRow][targetCol];
         Piece currPiece = currTile.getPiece();
+
+        if (currPiece == null){
+            System.out.println("No piece at selected tile!");
+            return;
+        }
 
         if (!currPiece.isValidMove(this, targetRow, targetCol)){
             return;

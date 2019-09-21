@@ -72,9 +72,11 @@ public class Tile {
     }
 
     public void moveBack(Board board, Piece removedPiece, int visitorRow, int visitorCol){
-        int playerNumber = removedPiece.getPlayerNumber();
-        List<Piece> playerPieces = board.getPlayerPieces(playerNumber);
-        playerPieces.add(removedPiece);
+        if (removedPiece != null) {
+            int playerNumber = removedPiece.getPlayerNumber();
+            List<Piece> playerPieces = board.getPlayerPieces(playerNumber);
+            playerPieces.add(removedPiece);
+        }
 
         Piece visitor = this.piece;
         visitor.setRow(visitorRow);

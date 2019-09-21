@@ -17,29 +17,33 @@ import org.junit.Test;
 
 
 public class BoardTest {
+
     @Test
-    public void testValidConstructor1(){
-        Board testBoard = new Board("normal");
+    public void testValidBoardConstructor1(){
+        String boardMode = "normal";
+        Board testBoard = new Board(boardMode);
         testBoard.printBoard();
     }
 
     @Test
-    public void testValidConstructor2(){
-        Board testBoard = new Board("beast mode!");
+    public void testValidBoardConstructor2(){
+        String boardMode = "beast mode!";
+        Board testBoard = new Board(boardMode);
         testBoard.printBoard();
     }
 
     @Test
-    public void testPlayerPiecesAfterInitialization(){
-        Board testBoard = new Board("normal");
-        List<Piece> piecesPlayer1 = testBoard.getPlayerPieces(1);
+    public void testPlayerPiecesAfterBoardInitialization(){
+        String boardMode = "normal";
+        Board testBoard = new Board(boardMode);
+        List<Piece> piecesPlayer1 = testBoard.getPlayerPieces(0);
         testBoard.printPlayerPieces(piecesPlayer1);
-        List<Piece> piecesPlayer2 = testBoard.getPlayerPieces(2);
+        List<Piece> piecesPlayer2 = testBoard.getPlayerPieces(1);
         testBoard.printPlayerPieces(piecesPlayer2);
     }
 
     @Test
-    public void testInitTileNormal(){
+    public void testValidMovePiece(){
 
     }
 }
