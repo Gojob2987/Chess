@@ -18,13 +18,13 @@ import org.junit.Test;
 
 public class BoardTest {
     @Test
-    public void ValidConstructor1(){
+    public void testValidConstructor1(){
         Board testBoard = new Board("normal");
         testBoard.printBoard();
     }
 
     @Test
-    public void ValidConstructor2(){
+    public void testValidConstructor2(){
         Board testBoard = new Board("beast mode!");
         testBoard.printBoard();
     }

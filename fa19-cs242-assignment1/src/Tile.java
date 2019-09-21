@@ -1,4 +1,6 @@
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Tile {
     protected int row, col;
@@ -48,18 +50,39 @@ public class Tile {
 
     /*========================CHANGE OF PIECE (MOVE IN / OUT)=======================*/
     public void moveIn(Board board, Piece visitor){
-        if (this.piece.getPieceName() == "King"){
-            board.setGameover();
-            return;
+        if (this.piece != null) {
+            if (this.piece.getPieceName() == "Piece.King") {
+                board.setGameover();
+                return;
+            }
+
+            int playerNumber = this.piece.getPlayerNumber();
+            List<Piece> playerPieces = board.getPlayerPieces(playerNumber);
+            playerPieces.remove(this.piece);
         }
+
         this.piece = visitor;
         visitor.setRow(row);
         visitor.setCol(col);
-
     }
+
 
     public void moveOut(){
         this.piece = null;
     }
 
+    public void moveBack(Board board, Piece removedPiece, int visitorRow, int visitorCol){
+        int playerNumber = removedPiece.getPlayerNumber();
+        List<Piece> playerPieces = board.getPlayerPieces(playerNumber);
+        playerPieces.add(removedPiece);
+
+        Piece visitor = this.piece;
+        visitor.setRow(visitorRow);
+        visitor.setCol(visitorCol);
+        Tile visitorTile = board.getTile(visitorRow, visitorCol);
+        visitorTile.setPiece(visitor);
+
+        this.piece = removedPiece;
+
+    }
 }

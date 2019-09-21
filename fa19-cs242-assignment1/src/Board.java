@@ -8,8 +8,8 @@ public class Board {
     private static Tile[][] tiles;
     private static int playerTurn; /* this is used interchangeably with player name in various printing*/
     private static boolean gameover;
-    private static List<Piece> piecesPlayer1;
-    private static List<Piece> piecesPlayer2;
+    private static List<Piece> player0Pieces;
+    private static List<Piece> player1Pieces;
 
     public Board(String boardMode){
         if ("normal".equals(boardMode)) {
@@ -37,23 +37,27 @@ public class Board {
     public Tile[][] getTiles(){
         return tiles;
     }
+    public Tile getTile(int targetRow, int targetCol){
+        return tiles[targetRow][targetCol];
+    }
     public int getPlayerTurn(){
         return playerTurn;
     }
-    public void setPlayerTurn(int newPlayerTurn){
-        playerTurn = newPlayerTurn;
+    public void changePlayerTurn(){
+        playerTurn = (playerTurn + 1) % 2;
     }
     public void setGameover(){
         gameover = true;
         System.out.println("player " + playerTurn + " has defeated their foe, congratulation!");
+        /* do something to break the game loop */
     }
 
     public List<Piece> getPlayerPieces(int playerNumber){
-        if (playerNumber == 1){
-            return piecesPlayer1;
+        if (playerNumber == 0){
+            return player0Pieces;
         }
         else{
-            return piecesPlayer2;
+            return player1Pieces;
         }
     }
 
@@ -85,14 +89,14 @@ public class Board {
         initPlayerPiecesNormal();
         initTilesNormal();
         initPiecesNormal();
-        playerTurn = 1;
+        playerTurn = 0;
         gameover = false;
         /*printBoard();*/
     }
 
     public void initPlayerPiecesNormal(){
-        piecesPlayer1 = new ArrayList<>(16);
-        piecesPlayer2 = new ArrayList<>(16);
+        player0Pieces = new ArrayList<>(16);
+        player1Pieces = new ArrayList<>(16);
     }
 
 
@@ -106,21 +110,21 @@ public class Board {
     }
 
     private void initPiecesNormal(){
-        initSpecialPiecesNormalForPlayerAtRow(1, 0, piecesPlayer1);
-        initPawnPiecesNormalForPlayerAtRow(1, 1, piecesPlayer1);
-        initSpecialPiecesNormalForPlayerAtRow(2, 7, piecesPlayer2);
-        initPawnPiecesNormalForPlayerAtRow(2, 6, piecesPlayer2);
+        initSpecialPiecesForPlayerAtRowNormal(0, 0, player0Pieces);
+        initPawnPiecesForPlayerAtRowNormal(0, 1, player0Pieces);
+        initSpecialPiecesForPlayerAtRowNormal(1, 7, player1Pieces);
+        initPawnPiecesForPlayerAtRowNormal(1, 6, player1Pieces);
     }
 
-    private void initSpecialPiecesNormalForPlayerAtRow(int playerNumber, int row, List<Piece> playerPieces) {
-        Rook rook1 = new Rook(row, 0, playerNumber);
-        Knight knight1 = new Knight(row, 1, playerNumber);
-        Bishop bishop1 = new Bishop(row, 2, playerNumber);
-        Queen queen = new Queen(row, 3, playerNumber);
-        King king = new King(row, 4, playerNumber);
-        Bishop bishop2 = new Bishop(row, 5, playerNumber);
-        Knight knight2 = new Knight(row, 6, playerNumber);
-        Rook rook2 = new Rook(row, 7, playerNumber);
+    private void initSpecialPiecesForPlayerAtRowNormal(int playerNumber, int row, List<Piece> playerPieces) {
+        Piece.Rook rook1 = new Piece.Rook(row, 0, playerNumber);
+        Piece.Knight knight1 = new Piece.Knight(row, 1, playerNumber);
+        Piece.Bishop bishop1 = new Piece.Bishop(row, 2, playerNumber);
+        Piece.Queen queen = new Piece.Queen(row, 3, playerNumber);
+        Piece.King king = new Piece.King(row, 4, playerNumber);
+        Piece.Bishop bishop2 = new Piece.Bishop(row, 5, playerNumber);
+        Piece.Knight knight2 = new Piece.Knight(row, 6, playerNumber);
+        Piece.Rook rook2 = new Piece.Rook(row, 7, playerNumber);
 
         tiles[row][0].setPiece(rook1);
         tiles[row][1].setPiece(knight1);
@@ -134,9 +138,9 @@ public class Board {
         playerPieces.addAll(Arrays.asList(rook1, knight1, bishop1, queen, king, bishop2, knight2, rook2));
 
     }
-    private void initPawnPiecesNormalForPlayerAtRow(int playerNumber, int row, List<Piece> playerPieces) {
+    private void initPawnPiecesForPlayerAtRowNormal(int playerNumber, int row, List<Piece> playerPieces) {
         for (int col = 0; col < width; col++) {
-            Pawn pawn = new Pawn(row, col, playerNumber);
+            Piece.Pawn pawn = new Piece.Pawn(row, col, playerNumber);
             tiles[row][col].setPiece(pawn);
             playerPieces.add(pawn);
         }
@@ -144,68 +148,88 @@ public class Board {
 
 
     /*==========================ENDGAME CHECK=======================*/
-    public boolean isCheckmate(){
-        if (playerTurn == 1){
-            return isCheckmateToMyFoe(piecesPlayer1, piecesPlayer2);
+
+    /*
+    Checkmate condition: isInCheck() + no legal move
+     */
+    public boolean isInCheck(){
+        if (playerTurn == 0){
+            return amIBeingChecked(player0Pieces, player1Pieces);
         }
         else{
-            return isCheckmateToMyFoe(piecesPlayer2, piecesPlayer1);
+            return amIBeingChecked(player1Pieces, player0Pieces);
         }
     }
 
-    private boolean isCheckmateToMyFoe(List<Piece> ownPlayerPieces, List<Piece> enemyPlayerPieces){
-        Piece enemyKing = enemyPlayerPieces.stream()
-                .filter(piece -> "King"
+    private boolean amIBeingChecked(List<Piece> myPieces, List<Piece> enemyPieces){
+        Piece myKing = myPieces.stream()
+                .filter(piece -> "Piece.King"
                         .equals(piece.getPieceName())).findAny().orElse(null);
-        for (Piece ownPiece : ownPlayerPieces){
-            int targetRow = enemyKing.getRow();
-            int targetCol = enemyKing.getCol();
-            if (ownPiece.isValidMove(this, targetRow, targetCol)) {
+
+        int targetRow = myKing.getRow();
+        int targetCol = myKing.getCol();
+        for (Piece enemyPiece : enemyPieces){
+            if (enemyPiece.isValidMove(this, targetRow, targetCol)){
                 return true;
             }
         }
         return false;
     }
 
-    /*==========================HOW A SINGLE TURN IS DONE=======================*/
-
-    public void movePiece(int currRow, int currCol, int targetRow, int targetCol){
-        if (currRow < 0 || currRow > width || currCol < 0 || currCol > height){
-            System.out.println("You cannot move the piece at" + currRow + ", " + currCol + ". it is out of board bound");
-            return;
-        }
-        Tile currTile = tiles[currRow][currCol];
-        Piece currPiece = currTile.getPiece();
-        if (currPiece == null){
-            System.out.println("No piece at selected location" + currRow + ", " + currCol);
-            return;
-        }
-        if (!currTile.getPiece().isValidMove(this, targetRow, targetCol)){
-            System.out.println("Invalid move, see why it is forbid in Piece :: isValidMove()");
-            return;
-        }
-
-        /* the actual moveIn (to targetRow, targetCol) and moveOut(from currRow, currCol) */
-        tiles[targetRow][targetCol].moveIn(this, currPiece);
-        currTile.moveOut();
-
-        /* check checkmate condition before switching player turn */
-        if (isCheckmate()){
-            System.out.println(playerTurn + "has Checkmate over the other player, do something!");
-        }
+    /* King is in Check and there is no legal move*/
+    public boolean isCheckmate(){
+        return isInCheck() && hasValidMoveForPieces();
+    }
 
 
-        /* change player turn */
-        if (getPlayerTurn() == 1){
-            setPlayerTurn(2);
+    public boolean isStalemate(){
+        return (!isInCheck()) && hasValidMoveForPieces();
+    }
+
+    public boolean hasValidMoveForPieces(){
+        List<Piece> myPieces = (playerTurn == 0) ? player0Pieces : player1Pieces;
+        for (Piece myPiece : myPieces){
+            if (myPiece.hasValidMoveForPiece(this)){
+                return false;
+            }
         }
-        else{
-            setPlayerTurn(1);
-        }
+        return true;
 
     }
 
 
+    /*==========================HOW A SINGLE TURN IS DONE=======================*/
 
+    public void movePiece(int currRow, int currCol, int targetRow, int targetCol){
+        if (isCheckmate()){
+            System.out.println("Player " + playerTurn + "lost due to Checkmate");
+            this.setGameover();
+            return;
+        }
+        if (isStalemate()){
+            System.out.println("A draw occurs due to Stalemate");
+            this.setGameover();
+            return;
+        }
+
+
+        Tile currTile = tiles[currRow][currCol];
+        Tile targetTile = tiles[targetRow][targetCol];
+        Piece currPiece = currTile.getPiece();
+
+        if (!currPiece.isValidMove(this, targetRow, targetCol)){
+            return;
+        }
+
+        /* the actual moveIn (to targetTile) and moveOut (from currTile)
+        *  piece removal is done in Tile.moveIn()
+        */
+        targetTile.moveIn(this, currPiece);
+        currTile.moveOut();
+
+        /* change player turn */
+        changePlayerTurn();
+
+    }
 
 }
