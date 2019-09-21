@@ -186,7 +186,7 @@ public class Piece {
 
 
     /*=======================Do I have Valid Move?===========================*/
-    public boolean hasValidMoveForPiece(Board board){
+    public boolean hasValidMoveToEscapeCheck(Board board){
         return true;
     }
 
@@ -198,7 +198,7 @@ public class Piece {
             int targetRow = row + i;
             int targetColUp = col + i;
             int targetColDown = col - i;
-            if (isValidMove(board, targetRow, targetColUp) && (isValidMove(board, targetRow, targetColDown))){
+            if (isValidMove(board, targetRow, targetColUp) || (isValidMove(board, targetRow, targetColDown))){
                 return true;
             }
         }
@@ -206,7 +206,7 @@ public class Piece {
     }
 
     /* used in Piece.Rook and Piece.Queen, and other long ranged unit moving horizontally / vertically */
-    public boolean hasValidMoveHorizontal(Board board){
+    public boolean hasValidMoveHorizontalVertical(Board board){
         Tile currTile = board.getTile(row, col);
         int boardWidth = board.getWidth();
         int boardHeight = board.getHeight();
@@ -230,24 +230,21 @@ public class Piece {
         int[] targetRowsShort = new int[]{row - 1, row + 1};
         int[] targetColsLong = new int[]{col - 2, col + 2};
         int[] targetColsShort = new int[]{col - 1, col + 1};
-        for (int targetRow : targetRowsLong){
-            for (int targetCol : targetColsShort){
-                if (isValidMove(board, targetRow, targetCol)){
-                    return true;
-                }
-            }
-        }
-        for (int targetRow : targetRowsShort){
-            for (int targetCol : targetColsLong){
-                if (isValidMove(board, targetRow, targetCol)){
+        if (hasValidMoveInGivenRowColArrays(board, targetRowsLong, targetColsShort)) return true;
+        if (hasValidMoveInGivenRowColArrays(board, targetRowsShort, targetColsLong)) return true;
+        return false;
+    }
+
+    public boolean hasValidMoveInGivenRowColArrays(Board board, int[] targetRows, int[] targetColsShort) {
+        for (int targetRow : targetRows) {
+            for (int targetCol : targetColsShort) {
+                if (this.isValidMove(board, targetRow, targetCol)) {
                     return true;
                 }
             }
         }
         return false;
     }
-
-
 
 
     /*==========================Children of Piece=======================*/
@@ -271,18 +268,22 @@ public class Piece {
             /* test if way is blocked (only possible at inital 2 steps move) */
             if (rowDiff == 2) {
                 if (playerNumber == 0 && row == 1) {
-                    valid = valid && (!tiles[row + 1][col].isOccupied());
+                    valid = !tiles[row + 1][col].isOccupied() && colDiff == 0;
                 } else if (playerNumber == 1 && row == 6) {
-                    valid = valid && (!tiles[row - 1][col].isOccupied());
+                    valid = !tiles[row - 1][col].isOccupied() && colDiff == 0;
                 } else return false; /* 2 steps move is only possible at initial position, row = 1 or 6*/
             }
             else {
-                valid = valid && (rowDiff == 1);
+                if (playerNumber == 0) {
+                    valid = (targetRow - row) == 1;
+                }
+                else{
+                    valid = (row - targetRow) == 1;
+                }
             }
 
-
             if (col != targetCol){
-                valid = valid && (colDiff < 2);
+                valid = valid && (colDiff == 1) && tiles[targetRow][targetCol].isOccupied(); /* can only move diagonally to capture */
             }
 
 
@@ -290,7 +291,7 @@ public class Piece {
         }
 
         @Override
-        public boolean hasValidMoveForPiece(Board board){
+        public boolean hasValidMoveToEscapeCheck(Board board){
             return hasValidMoveDiagonal(board);
         }
     }
@@ -310,7 +311,7 @@ public class Piece {
         }
 
         @Override
-        public boolean hasValidMoveForPiece(Board board){
+        public boolean hasValidMoveToEscapeCheck(Board board){
             return hasValidMoveDiagonal(board);
         }
     }
@@ -329,8 +330,8 @@ public class Piece {
             return isValidMoveHorizontalVertical(board, targetRow, targetCol);
         }
         @Override
-        public boolean hasValidMoveForPiece(Board board){
-            return hasValidMoveHorizontal(board);
+        public boolean hasValidMoveToEscapeCheck(Board board){
+            return hasValidMoveHorizontalVertical(board);
         }
     }
 
@@ -355,17 +356,11 @@ public class Piece {
         }
 
         @Override
-        public boolean hasValidMoveForPiece(Board board){
+        public boolean hasValidMoveToEscapeCheck(Board board){
             Tile currTile = board.getTile(row, col);
             int[] targetRows = new int[]{row - 1, row, row + 1};
             int[] targetCols = new int[]{col - 1, col, col + 1};
-            for (int targetRow : targetRows){
-                for (int targetCol : targetCols){
-                    if (isValidMove(board, targetRow, targetCol)){
-                        return true;
-                    }
-                }
-            }
+            if (hasValidMoveInGivenRowColArrays(board, targetRows, targetCols)) {return true;}
             return false;
         }
     }
@@ -382,12 +377,12 @@ public class Piece {
             if (!super.isValidMove(board, targetRow, targetCol)) {
                 return false;
             }
-            return isValidMoveDiagonal(board, targetRow, targetCol) && isValidMoveHorizontalVertical(board, targetRow, targetCol);
+            return isValidMoveDiagonal(board, targetRow, targetCol) || isValidMoveHorizontalVertical(board, targetRow, targetCol);
         }
 
         @Override
-        public boolean hasValidMoveForPiece(Board board) {
-            return hasValidMoveDiagonal(board) && hasValidMoveHorizontal(board);
+        public boolean hasValidMoveToEscapeCheck(Board board) {
+            return hasValidMoveDiagonal(board) && hasValidMoveHorizontalVertical(board);
         }
     }
 
@@ -404,14 +399,14 @@ public class Piece {
             }
             int rowDiff = Math.abs(row - targetRow);
             int colDiff = Math.abs(col - targetCol);
-            if (!(rowDiff == 1 && colDiff == 2) || !(rowDiff == 2 && colDiff == 1)){
-                return false;
+            if ((rowDiff == 1 && colDiff == 2) || (rowDiff == 2 && colDiff == 1)){
+                return true;
             }
-            return true;
+            return false;
         }
 
         @Override
-        public boolean hasValidMoveForPiece(Board board){
+        public boolean hasValidMoveToEscapeCheck(Board board){
             return hasValidMoveKnightJump(board);
         }
     }

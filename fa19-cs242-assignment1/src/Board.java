@@ -67,11 +67,25 @@ public class Board {
         }
     }
 
-    public void printPlayerPieces(List<Piece> playerPieces){
+    public void printPlayerPieces(int playerNumber){
+        List<Piece> playerPieces = this.getPlayerPieces(playerNumber);
         for (Piece piece : playerPieces){
             System.out.print(piece.pieceToString() + " ");
         }
         System.out.println();
+    }
+
+    public int getPieceCount(int playerNumber, String pieceName){
+        List<Piece> playerPieces = this.getPlayerPieces(playerNumber);
+        int pieceCount = 0;
+        if (playerPieces != null) { /* if it is null game is already over tbh */
+            for (Piece playerPiece : playerPieces){
+                if (playerPiece.getPieceName().equals(pieceName)){
+                    pieceCount ++;
+                }
+            }
+        }
+        return pieceCount;
     }
 
     public void printBoard(){
@@ -79,7 +93,7 @@ public class Board {
             System.out.println("board is not initialized, call one of the initBoard() functions first");
             return;
         }
-        System.out.println("Total Turns: " + totalTurn + "; Current Player Turn: " + playerTurn);
+        System.out.println("Total Turns (from 0) " + totalTurn + "; Current Player Turn: " + playerTurn);
         for (int row = 0; row < width; row ++){
             for (int col = 0; col < height; col ++){
                 System.out.print(tiles[row][col].tileToString() + " ");
@@ -186,29 +200,29 @@ public class Board {
 
     /* King is in Check and there is no legal move*/
     public boolean isCheckmate(){
-        return isInCheck() && hasValidMoveForPieces();
+        return isInCheck() && !hasValidMoveForPieces();
     }
 
 
     public boolean isStalemate(){
-        return (!isInCheck()) && hasValidMoveForPieces();
+        return (!isInCheck()) && !hasValidMoveForPieces();
     }
 
     public boolean hasValidMoveForPieces(){
         List<Piece> myPieces = (playerTurn == 0) ? player0Pieces : player1Pieces;
         for (Piece myPiece : myPieces){
-            if (myPiece.hasValidMoveForPiece(this)){
-                return false;
+            if (myPiece.hasValidMoveToEscapeCheck(this)){
+                return true;
             }
         }
-        return true;
+        return false;
 
     }
 
 
     /*==========================HOW A SINGLE TURN IS DONE=======================*/
 
-    public void movePiece(int currRow, int currCol, int targetRow, int targetCol){
+    public void movePieceByPosition(int currRow, int currCol, int targetRow, int targetCol){
         if (isCheckmate()){
             System.out.println("Player " + playerTurn + "lost due to Checkmate");
             this.setGameover();
@@ -248,6 +262,14 @@ public class Board {
         changePlayerTurn();
         setTotalTurn(totalTurn + 1);
 
+    }
+
+    public void movePieceByPiece(Piece myPiece, int targetRow, int targetCol){
+        if (myPiece == null) {
+            System.out.println("Please select the Piece you want to move");
+            return;
+        }
+        movePieceByPosition(myPiece.getRow(), myPiece.getCol(), targetRow, targetCol);
     }
 
 
