@@ -211,7 +211,7 @@ public class Board {
     public boolean hasValidMoveForPieces(){
         List<Piece> myPieces = (playerTurn == 0) ? player0Pieces : player1Pieces;
         for (Piece myPiece : myPieces){
-            if (myPiece.hasValidMoveToEscapeCheck(this)){
+            if (myPiece.hasValidMove(this)){
                 return true;
             }
         }

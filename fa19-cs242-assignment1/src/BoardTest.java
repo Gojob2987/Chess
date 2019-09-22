@@ -1,7 +1,5 @@
 import org.junit.Test;
 
-import java.util.List;
-
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertNotEquals;
 
@@ -112,7 +110,7 @@ public class BoardTest {
         testBoard.movePieceByPosition(1, 1, 2, 1); /* Pawn-0 */
         testBoard.movePieceByPosition(4, 3, 3, 3); /* King-1 */
         testBoard.movePieceByPosition(1, 2, 2, 2); /* Pawn-0 */
-        assertTrue(testKing1.hasValidMoveToEscapeCheck(testBoard));
+        assertTrue(testKing1.hasValidMove(testBoard));
         testBoard.printBoard();
 
     }

@@ -186,7 +186,7 @@ public class Piece {
 
 
     /*=======================Do I have Valid Move?===========================*/
-    public boolean hasValidMoveToEscapeCheck(Board board){
+    public boolean hasValidMove(Board board){
         return true;
     }
 
@@ -291,8 +291,10 @@ public class Piece {
         }
 
         @Override
-        public boolean hasValidMoveToEscapeCheck(Board board){
-            return hasValidMoveDiagonal(board);
+        public boolean hasValidMove(Board board){
+            int[] targetRows = new int[]{row - 2, row - 1, row, row + 1, row + 2};
+            int[] targetCols = new int[]{col - 1, col, col + 1};
+            return hasValidMoveInGivenRowColArrays(board, targetRows, targetCols);
         }
     }
 
@@ -311,7 +313,7 @@ public class Piece {
         }
 
         @Override
-        public boolean hasValidMoveToEscapeCheck(Board board){
+        public boolean hasValidMove(Board board){
             return hasValidMoveDiagonal(board);
         }
     }
@@ -330,7 +332,7 @@ public class Piece {
             return isValidMoveHorizontalVertical(board, targetRow, targetCol);
         }
         @Override
-        public boolean hasValidMoveToEscapeCheck(Board board){
+        public boolean hasValidMove(Board board){
             return hasValidMoveHorizontalVertical(board);
         }
     }
@@ -356,12 +358,11 @@ public class Piece {
         }
 
         @Override
-        public boolean hasValidMoveToEscapeCheck(Board board){
+        public boolean hasValidMove(Board board){
             Tile currTile = board.getTile(row, col);
             int[] targetRows = new int[]{row - 1, row, row + 1};
             int[] targetCols = new int[]{col - 1, col, col + 1};
-            if (hasValidMoveInGivenRowColArrays(board, targetRows, targetCols)) {return true;}
-            return false;
+            return hasValidMoveInGivenRowColArrays(board, targetRows, targetCols);
         }
     }
 
@@ -381,8 +382,8 @@ public class Piece {
         }
 
         @Override
-        public boolean hasValidMoveToEscapeCheck(Board board) {
-            return hasValidMoveDiagonal(board) && hasValidMoveHorizontalVertical(board);
+        public boolean hasValidMove(Board board) {
+            return hasValidMoveDiagonal(board) || hasValidMoveHorizontalVertical(board);
         }
     }
 
@@ -406,7 +407,7 @@ public class Piece {
         }
 
         @Override
-        public boolean hasValidMoveToEscapeCheck(Board board){
+        public boolean hasValidMove(Board board){
             return hasValidMoveKnightJump(board);
         }
     }
