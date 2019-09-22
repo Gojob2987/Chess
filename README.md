@@ -8,22 +8,22 @@ https://wiki.illinois.edu/wiki/pages/viewpage.action?pageId=528356499
 	
 ## todo:
 ### part 0
-- [x] create branch for assignment1.1
+- [x] creaate branch for assignment1.1
 
 ### part 1
 
-- [ ] test cases
-- [ ] debug
+- [x] test cases
+- [x] debug
 - [x] unimplemented functionality (end game)
-- [ ] refactor(code smell elimination)
+- [x] refactor(code smell elimination)
 
 ### part 2
-- [ ] generate documentation with doxygen
+- [x] generate documentation with doxygen (tho it is rather empty, maybe the comments were ignored)
 
 ### part 3
-- [ ] custom chess pieces x 2
+- [x] custom chess pieces x 2 (Catapult and Blinker)
 
 ### part 4
-- [ ] static GUI
+- [x] static GUI (we have a board and colorful pieces at least)
 
 

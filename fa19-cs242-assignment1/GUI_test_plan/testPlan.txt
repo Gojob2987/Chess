@@ -1,0 +1,10 @@
+- Load the project into Intellij IDEA
+
+- Check src/Asset folder and make sure there are 12 png files of chess piece icons. The file names should match those shown in GUI_test_plan/testAssetAvailable.png
+
+- Open src/View/ChessGUI.java inside Intellij IDEA, right click it and select "Run 'ChessGUI.main()'", as shown in GUI_test_plan/testRunGUI.png
+
+- A chessboard GUI should be generated like the one shown in GUI_test_plan/testShowBoard.png
+
+- Left click the red X exit button on the upper left corner of the GUI, as shown in GUI/test_plan/testShowBoard.png, and the program should exit.
+
