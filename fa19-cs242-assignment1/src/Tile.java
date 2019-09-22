@@ -5,6 +5,7 @@ import java.util.List;
 public class Tile {
     protected int row, col;
     protected Piece piece;
+    private static final int maxPrintTileLength = 15;
 
     public Tile(int row, int col, Piece piece){
         this.row = row;
@@ -43,9 +44,8 @@ public class Tile {
 
     public String tileToStringPadded(String result){
         String paddedString = result;
-        int length = "1,1 Bishop-0".length();
         int currentLength = result.length();
-        for (int i = 0; i < length - currentLength; i ++){
+        for (int i = 0; i < maxPrintTileLength - currentLength; i ++){
             paddedString += " ";
         }
         return paddedString;

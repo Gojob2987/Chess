@@ -115,7 +115,7 @@ public class BoardTest {
 
     }
 
-
+    /** Set up for testInCheck()*/
     public static void setUpClearPathForCheck(Board testBoard) {
         Piece testPawn0 = testBoard.getTile(1, 3).getPiece();
         Piece testPawn1 = testBoard.getTile(6, 3).getPiece();

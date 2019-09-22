@@ -1,4 +1,8 @@
 import org.junit.Test;
+
+import java.util.Iterator;
+import java.util.List;
+
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertNotEquals;
 
@@ -139,9 +143,69 @@ public class PieceTest {
 
     }
 
+    @Test
+    public void testMoveCatapult(){
+        Piece testCatapult0 = new Piece.Catapult(0, 0, 0);
+        setUpInitPiece(testCatapult0);
+        assertFalse(testCatapult0.isValidMove(testBoard, 0, 1));
+        assertFalse(testCatapult0.isValidMove(testBoard, 2, 0));
+        assertTrue(testCatapult0.isValidMove(testBoard, 6, 0));
+
+        testBoard.movePieceByPiece(testCatapult0, 6, 0);
+        testBoard.movePieceByPosition(6, 2, 5, 2);
+        testBoard.printBoard();
+
+        assertTrue(testCatapult0.hasValidMove(testBoard));
+        assertFalse(testCatapult0.isValidMove(testBoard, 6, 2));
+        assertFalse(testCatapult0.isValidMove(testBoard, 6, 4));
+        assertFalse(testCatapult0.isValidMove(testBoard, 7, 0));
+        assertFalse(testCatapult0.isValidMove(testBoard, 7, 1));
+        assertFalse(testCatapult0.isValidMove(testBoard, 0, 0));
+        assertTrue(testCatapult0.isValidMove(testBoard, 2, 0));
+        assertTrue(testCatapult0.isValidMove(testBoard, 6, 3));
+    }
+
+    @Test
+    public void testMoveBlinker(){
+        Piece testBlinker0 = new Piece.Blinker(0, 0, 0);
+        setUpInitPiece(testBlinker0);
+        assertFalse(testBlinker0.isValidMove(testBoard, 0, 1));
+        assertTrue(testBlinker0.isValidMove(testBoard, 2, 1));
+        assertTrue(testBlinker0.isValidMove(testBoard, 2, 6));
+
+        testBoard.movePieceByPiece(testBlinker0, 2, 1);
+        testBoard.movePieceByPosition(6,1, 4, 1);
+        testBoard.printBoard();
+
+        assertTrue(testBlinker0.hasValidMove(testBoard));
+        assertFalse(testBlinker0.isValidMove(testBoard, 3, 1));
+        assertFalse(testBlinker0.isValidMove(testBoard, 5, 2));
+        assertTrue(testBlinker0.isValidMove(testBoard, 0, 0));
+        assertTrue(testBlinker0.isValidMove(testBoard, 2, 0));
+
+    }
+
+    /** Set up that adds targetPiece into the game (board and playerPieces),
+     * remove the piece from tile at targetPiece's location*/
+    public void setUpInitPiece(Piece targetPiece){
+        if (targetPiece == null){
+            System.out.println("targetPiece cannot be null");
+            return;
+        }
+
+        int targetRow = targetPiece.getRow();
+        int targetCol = targetPiece.getCol();
+        int targetPlayerNumber = targetPiece.getPlayerNumber();
+        List<Piece> playerPieces = testBoard.getPlayerPieces(targetPlayerNumber);
+        playerPieces.removeIf(e -> e.getRow() == targetRow && e.getCol() == targetCol);
+        playerPieces.add(targetPiece);
+        Tile targetInitTile = testBoard.getTile(targetRow, targetCol);
+        targetInitTile.setPiece(targetPiece);
+    }
 
 
-    /* set up (move blocking pawns away), do a printBoard() to see what it does*/
+
+    /** Set up that moves blocking pawns away*/
     public void setUpClearPathForRookBishop(){
         Piece testPawn0 = testBoard.getTile(1, 0).getPiece();
         Piece testPawn1 = testBoard.getTile(6, 1).getPiece();

@@ -1,3 +1,5 @@
+import java.util.List;
+
 public class Piece {
     protected int row, col, playerNumber;
     protected String name;
@@ -178,10 +180,94 @@ public class Piece {
                 }
             }
         }
-
-
         return true;
     }
+
+    /* used for Catapult units (can move horizontally or vertically when not capturing; need middle unit to capture) */
+    public boolean isValidMoveCatapult(Board board, int targetRow, int targetCol){
+        int rowDiff = row - targetRow;
+        int colDiff = col - targetCol;
+        Piece targetPiece = board.getTile(targetRow, targetCol).getPiece();
+        if (targetPiece != null && targetPiece.getPlayerNumber() != playerNumber) {
+            int midPieceCount = 0;
+            if (row == targetRow) {
+                int minCol = Math.min(col, targetCol);
+                int maxCol = Math.max(col, targetCol);
+                for (int midCol = minCol + 1; midCol < maxCol; midCol++) {
+                    Piece midPiece = board.getTile(row, midCol).getPiece();
+                    if (midPiece != null) {
+                        midPieceCount ++;
+                    }
+                }
+            } else if (col == targetCol) {
+                int minRow = Math.min(row, targetRow);
+                int maxRow = Math.max(row, targetRow);
+                for (int midRow = minRow + 1; midRow < maxRow; midRow++) {
+                    Piece midPiece = board.getTile(midRow, col).getPiece();
+                    if (midPiece != null) {
+                        midPieceCount ++;
+                    }
+                }
+            }
+            return midPieceCount == 1;
+        }
+        else{
+            return isValidMoveHorizontalVertical(board, targetRow, targetCol);
+        }
+    }
+
+    /** Blinker unit can teleport to the neighbor tiles of a friendly piece; CANNOT attack.*/
+    public boolean isValidMoveBlinker(Board board, int targetRow, int targetCol){
+        Piece targetPiece = board.getTile(targetRow, targetCol).getPiece();
+        if (targetPiece != null){ /* cannot move to tile occupied by either a friendly piece or an enemy piece*/
+            return false;
+        }
+
+        return neighborTilesScan(board, targetRow, targetCol, 1);
+    }
+
+    private boolean isPositionInBound(Board board, int targetRow, int targetCol){
+        return targetRow >= 0 && targetRow < board.getWidth() && targetCol >= 0 && targetCol < board.getHeight();
+    }
+
+    private boolean isTileOccupiedByFriendlyPiece(Board board, int targetRow, int targetCol){
+        Piece targetPiece = board.getTile(targetRow, targetCol).getPiece();
+        if (targetPiece != null && targetPiece.getPlayerNumber() == playerNumber){
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isTileOccupiedByPiece(Board board, int targetRow, int targetCol){
+        Piece targetPiece = board.getTile(targetRow, targetCol).getPiece();
+        if (targetPiece != null) {
+            return true;
+        }
+        return false;
+    }
+
+    /** Scan neighboring 8 tiles for given location
+     * mode = 0: true if at least one tile is empty
+     * mode = 1: true if at least one tile is occupied by a friendly piece other than self*/
+    private boolean neighborTilesScan(Board board, int targetRow, int targetCol, int mode){
+        int[] neighborRows = new int[]{targetRow - 1, targetRow, targetRow + 1, targetRow - 1, targetRow + 1, targetRow - 1, targetRow, targetRow + 1};
+        int[] neighborCols = new int[]{targetCol - 1, targetCol - 1, targetCol - 1, targetCol, targetCol, targetCol + 1, targetCol + 1, targetCol + 1};
+        for (int i = 0; i < 8; i ++) {
+            int neighborRow = neighborRows[i];
+            int neighborCol = neighborCols[i];
+            if (!isPositionInBound(board, neighborRow, neighborCol)){
+                continue;
+            }
+            if (mode == 0 && !isTileOccupiedByPiece(board, neighborRow, neighborCol)){
+                return true;
+            }
+            if (mode == 1 && isTileOccupiedByFriendlyPiece(board, neighborRow, neighborCol) && !(neighborRow == row && neighborCol == col)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 
 
@@ -235,6 +321,37 @@ public class Piece {
         return false;
     }
 
+    public boolean hasValidMoveCatapult(Board board){
+        int boardWidth = board.getWidth();
+        int boardHeight = board.getHeight();
+        for (int i = 0; i < boardWidth; i ++){
+            if (this.isValidMove(board, i, col)){
+                return true;
+            }
+        }
+        for (int i = 0; i < boardHeight; i ++){
+            if (this.isValidMove(board, row, i)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    public boolean hasValidMoveBlinker(Board board){
+        int boardWidth = board.getWidth();
+        int boardHeight = board.getHeight();
+        for (int iterRow = 0; iterRow < boardWidth; iterRow ++){
+            for (int iterCol = 0; iterCol < boardHeight; iterCol ++){
+                if (isValidMoveBlinker(board, iterRow, iterCol)){
+                    return true;
+                }
+            }
+        }
+        return false;
+
+    }
+
     public boolean hasValidMoveInGivenRowColArrays(Board board, int[] targetRows, int[] targetColsShort) {
         for (int targetRow : targetRows) {
             for (int targetCol : targetColsShort) {
@@ -245,6 +362,7 @@ public class Piece {
         }
         return false;
     }
+
 
 
     /*==========================Children of Piece=======================*/
@@ -411,6 +529,53 @@ public class Piece {
             return hasValidMoveKnightJump(board);
         }
     }
+
+    /** Catapult: horizontal / vertical move on unblocked path;
+     * when trying to capture, need to have one (and only one) middle piece to jump over*/
+    public static class Catapult extends Piece{
+        public Catapult (int row, int col, int playerNumber){
+            super(row, col, playerNumber);
+            setPieceName("Catapult");
+        }
+
+        @Override
+        public boolean isValidMove(Board board, int targetRow, int targetCol) {
+            if (!super.isValidMove(board, targetRow, targetCol)) {
+                return false;
+            }
+            return isValidMoveCatapult(board, targetRow, targetCol);
+        }
+
+        @Override
+        public boolean hasValidMove(Board board){
+            return hasValidMoveCatapult(board);
+        }
+
+    }
+    /** Blinker: can teleport to the neighbor tiles of a friendly piece;
+     * cannot attack.*/
+    public static class Blinker extends Piece {
+        public Blinker (int row, int col, int playerNumber){
+            super(row, col, playerNumber);
+            setPieceName("Blinker");
+        }
+
+        @Override
+        public boolean isValidMove(Board board, int targetRow, int targetCol) {
+            if (!super.isValidMove(board, targetRow, targetCol)) {
+                return false;
+            }
+            return isValidMoveBlinker(board, targetRow, targetCol);
+        }
+
+        @Override
+        public boolean hasValidMove(Board board){
+            return hasValidMoveBlinker(board);
+        }
+
+
+    }
+
 
 }
 
