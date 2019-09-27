@@ -15,17 +15,17 @@ https://wiki.illinois.edu/wiki/display/cs242/Assignment+1.2
 - [ ] refactor(code smell elimination)
 
 ### part 1
-- [] game loop
+- [ ] game loop
 
 ### part 2
-- [] GUI
+- [ ] GUI
 
 ### part 3
-- [] undo 
 - [x] moveBack()
+- [ ] undo 
 
 
 ### part 4
-- [] test plan
+- [ ] test plan
 
 
