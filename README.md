@@ -1,29 +1,29 @@
 # fa19-cs242-assignment1.1
 
 assignment1.0 (chess board & pieces)
+assignment1.1 (refactor, automated documentation, custom pieces, GUI)
 
--> assignment1.1 (polishing, automated documentation, custom pieces, GUI)
-
-https://wiki.illinois.edu/wiki/pages/viewpage.action?pageId=528356499
+-> assignment1.2 (refactor, game loop, GUI, undo, test plan)
+https://wiki.illinois.edu/wiki/display/cs242/Assignment+1.2
 	
 ## todo:
 ### part 0
-- [x] creaate branch for assignment1.1
+- [x] create branch for assignment1.2
+- [] wrapper class Coordinate
+- [] refactor(code smell elimination)
 
 ### part 1
-
-- [x] test cases
-- [x] debug
-- [x] unimplemented functionality (end game)
-- [x] refactor(code smell elimination)
+- [] game loop
 
 ### part 2
-- [x] generate documentation with doxygen (tho it is rather empty, maybe the comments were ignored)
+- [] GUI
 
 ### part 3
-- [x] custom chess pieces x 2 (Catapult and Blinker)
+- [] undo 
+- [x] moveBack()
+
 
 ### part 4
-- [x] static GUI (we have a board and colorful pieces at least)
+- [] test plan
 
 
