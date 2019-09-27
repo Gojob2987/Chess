@@ -1,5 +1,7 @@
 package Model;
 
+import Model.Pieces.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -141,14 +143,14 @@ public class Board {
     }
 
     private void initSpecialPiecesForPlayerAtRowNormal(int playerNumber, int row, List<Piece> playerPieces) {
-        Piece.Rook rook1 = new Piece.Rook(row, 0, playerNumber);
-        Piece.Knight knight1 = new Piece.Knight(row, 1, playerNumber);
-        Piece.Bishop bishop1 = new Piece.Bishop(row, 2, playerNumber);
-        Piece.Queen queen = new Piece.Queen(row, 3, playerNumber);
-        Piece.King king = new Piece.King(row, 4, playerNumber);
-        Piece.Bishop bishop2 = new Piece.Bishop(row, 5, playerNumber);
-        Piece.Knight knight2 = new Piece.Knight(row, 6, playerNumber);
-        Piece.Rook rook2 = new Piece.Rook(row, 7, playerNumber);
+        Rook rook1 = new Rook(row, 0, playerNumber);
+        Knight knight1 = new Knight(row, 1, playerNumber);
+        Bishop bishop1 = new Bishop(row, 2, playerNumber);
+        Queen queen = new Queen(row, 3, playerNumber);
+        King king = new King(row, 4, playerNumber);
+        Bishop bishop2 = new Bishop(row, 5, playerNumber);
+        Knight knight2 = new Knight(row, 6, playerNumber);
+        Rook rook2 = new Rook(row, 7, playerNumber);
 
         tiles[row][0].setPiece(rook1);
         tiles[row][1].setPiece(knight1);
@@ -164,7 +166,7 @@ public class Board {
     }
     private void initPawnPiecesForPlayerAtRowNormal(int playerNumber, int row, List<Piece> playerPieces) {
         for (int col = 0; col < width; col++) {
-            Piece.Pawn pawn = new Piece.Pawn(row, col, playerNumber);
+            Pawn pawn = new Pawn(row, col, playerNumber);
             tiles[row][col].setPiece(pawn);
             playerPieces.add(pawn);
         }
@@ -178,14 +180,14 @@ public class Board {
      */
     public boolean isInCheck(){
         if (playerTurn == 0){
-            return amIBeingChecked(player0Pieces, player1Pieces);
+            return isInCheckHelper(player0Pieces, player1Pieces);
         }
         else{
-            return amIBeingChecked(player1Pieces, player0Pieces);
+            return isInCheckHelper(player1Pieces, player0Pieces);
         }
     }
 
-    private boolean amIBeingChecked(List<Piece> myPieces, List<Piece> enemyPieces){
+    private boolean isInCheckHelper(List<Piece> myPieces, List<Piece> enemyPieces){
         Piece myKing = myPieces.stream()
                 .filter(piece -> "King"
                         .equals(piece.getPieceName())).findAny().orElse(null);
@@ -224,7 +226,7 @@ public class Board {
 
     /*==========================HOW A SINGLE TURN IS DONE=======================*/
 
-    public void movePieceByPosition(int currRow, int currCol, int targetRow, int targetCol){
+    public void movePieceByLocation(int currRow, int currCol, int targetRow, int targetCol){
         if (isCheckmate()){
             System.out.println("Player " + playerTurn + "lost due to Checkmate");
             this.setGameover();
@@ -245,8 +247,18 @@ public class Board {
             System.out.println("No piece at selected tile!");
             return;
         }
-        if (currPiece.getPlayerNumber() != playerTurn){
-            System.out.println("Current playerTurn is " + playerTurn + ", not " + currPiece.getPlayerNumber());
+
+        /* IMPORTANT! this test cannot be put in Piece.isValidMove
+
+        * Consider this: Queen-0 and King-1 are in the same row, current playerTurn = 1.
+        * King-1 has to avoid being Checked by Queen-0, or game will be over next turn.
+        * The threat from Queen-0 to King-1 needs to be marked as valid.
+        *
+        * */
+        if(currPiece.getPlayerNumber() != playerTurn){
+            if (printErrorMsg){
+                System.out.println("Current playerTurn is " + playerTurn+ ", not " + currPiece.getPlayerNumber());
+            }
             return;
         }
 
@@ -271,7 +283,7 @@ public class Board {
             System.out.println("Please select the Model.Piece you want to move");
             return;
         }
-        movePieceByPosition(myPiece.getRow(), myPiece.getCol(), targetRow, targetCol);
+        movePieceByLocation(myPiece.getRow(), myPiece.getCol(), targetRow, targetCol);
     }
 
 

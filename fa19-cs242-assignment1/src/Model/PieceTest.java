@@ -1,5 +1,7 @@
 package Model;
 
+import Model.Pieces.Blinker;
+import Model.Pieces.Catapult;
 import org.junit.Test;
 
 import java.util.List;
@@ -146,7 +148,7 @@ public class PieceTest {
 
     @Test
     public void testMoveCatapult(){
-        Piece testCatapult0 = new Piece.Catapult(0, 0, 0);
+        Piece testCatapult0 = new Catapult(0, 0, 0);
         setUpInitPiece(testCatapult0);
         assertFalse(testCatapult0.isValidMove(testBoard, 0, 1));
         assertFalse(testCatapult0.isValidMove(testBoard, 2, 0));
@@ -168,7 +170,7 @@ public class PieceTest {
 
     @Test
     public void testMoveBlinker(){
-        Piece testBlinker0 = new Piece.Blinker(0, 0, 0);
+        Piece testBlinker0 = new Blinker(0, 0, 0);
         setUpInitPiece(testBlinker0);
         assertFalse(testBlinker0.isValidMove(testBoard, 0, 1));
         assertTrue(testBlinker0.isValidMove(testBoard, 2, 1));

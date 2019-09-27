@@ -11,8 +11,10 @@ https://wiki.illinois.edu/wiki/display/cs242/Assignment+1.2
 ## todo:
 ### part 0
 - [x] create branch for assignment1.2
-- [ ] wrapper class Coordinate
 - [ ] refactor(code smell elimination)
+- [x] more documentation
+- [x] extract individual Piece into another package
+- [-] (wrapper class Coordinate)  THIS IS BAD IDEA, TRADEOFF NOT WORTH
 
 ### part 1
 - [ ] game loop

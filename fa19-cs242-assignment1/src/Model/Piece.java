@@ -50,26 +50,43 @@ public class Piece {
 
     /*=======================Is this Move Valid?===========================*/
 
-    /* Check test for all pieces (aka will this move result in me being inCheck) */
+    /**
+     * Used in all Pieces.
+     *
+     * Various fundamental move tests are performed:
+     *
+     * {@link #isLocationInBound(Board, int, int)}
+     *
+     * {@link #isTargetLocationSameAsCurrentLocation(int, int)}
+     *
+     * {@link #isTileOccupiedByFriendlyPiece(Board, int, int)}
+     *
+     * {@link #isValidMoveAvoidingCheck(Board, int, int)}
+     *
+     *
+     * @param board
+     * @param targetRow
+     * @param targetCol
+     * @return true if the move is valid in regard to several fundamental move tests.
+     */
     public boolean isValidMove(Board board, int targetRow, int targetCol){
         boolean printErrorMsg = board.getPrintErrorMsg();
 
-        if (targetRow < 0 || targetRow >= board.getWidth() || targetCol < 0 || targetCol >= board.getHeight()){
+
+        if (!isLocationInBound(board, targetRow, targetCol)){
             if (printErrorMsg){
                 System.out.println("Illegal move: out of board bound");
             }
             return false;
         }
-        if (row == targetRow && col == targetCol){
+        if (isTargetLocationSameAsCurrentLocation(targetRow, targetCol)){
             if (printErrorMsg){
                 System.out.println("Illegal move: staying at current position");
             }
             return false;
         }
 
-        Tile targetTile = board.getTile(targetRow, targetCol);
-        Piece targetPiece = targetTile.getPiece();
-        if (targetPiece != null && (playerNumber == targetPiece.getPlayerNumber())){
+        if (isTileOccupiedByFriendlyPiece(board, targetRow, targetCol)){
             if (printErrorMsg) {
                 System.out.println("Illegal move: you cant eat your own piece, at least shouldn't");
             }
@@ -86,6 +103,21 @@ public class Piece {
         return true;
     }
 
+
+
+    /**
+     * Used in all Pieces.
+     *
+     * Check if the move will put your King in Check.
+     *
+     * The function will move current Piece into target coordinate and see if your King is in Check,
+     * then call moveBack() to undo the move.
+     *
+     * @param board
+     * @param targetRow
+     * @param targetCol
+     * @return true if the move will NOT put your King in Check (aka move is legal).
+     */
     public boolean isValidMoveAvoidingCheck(Board board, int targetRow, int targetCol){
         if (playerNumber != board.getPlayerTurn()){
             return true; /* for this is not my turn, so wherever i move i wont get myself in check; i simply cant move */
@@ -109,7 +141,16 @@ public class Piece {
     }
 
 
-    /* used in Model.Piece.Bishop and Model.Piece.Queen, and other long ranged unit moving diagonally*/
+    /**
+     * Used in Model.Pieces.Bishop, Model.Pieces.Queen.
+     *
+     * For Piece that can move diagonally, with no blocking Piece in path.
+     *
+     * @param board
+     * @param targetRow
+     * @param targetCol
+     * @return true if the Piece can move to target coordinate according to its basic movement rules (diagonal).
+     */
     public boolean isValidMoveDiagonal(Board board, int targetRow, int targetCol){
         boolean printErrorMsg = board.getPrintErrorMsg();
 
@@ -141,7 +182,17 @@ public class Piece {
     }
 
 
-    /* used in Model.Piece.Rook and Model.Piece.Queen, and other long ranged unit moving horizontally / vertically */
+    /**
+     * Used in Model.Pieces.Rook, Model.Pieces.Queen, Model.Pieces.Catapult.
+     *
+     * For Piece that can move horizontally / vertically, with no blocking Piece in path.
+     *
+     * @param board
+     * @param targetRow
+     * @param targetCol
+     * @return true if the Piece can move to target coordinate according to its basic movement rules (horizontal /vertical)
+     *
+     */
     public boolean isValidMoveHorizontalVertical(Board board, int targetRow, int targetCol){
         boolean printErrorMsg = board.getPrintErrorMsg();
 
@@ -183,7 +234,18 @@ public class Piece {
         return true;
     }
 
-    /* used for Catapult units (can move horizontally or vertically when not capturing; need middle unit to capture) */
+
+    /**
+     * Catapult can move horizontally / vertically like Rook, when it is not capturing.
+     * When trying to capture, one (and only one) Piece needs to be in between Catapult and the target.
+     *
+     * @param board
+     * @param targetRow
+     * @param targetCol
+     * @return true if Catapult can move to target coordinate according to its basic movement rules.
+     *
+     *
+     */
     public boolean isValidMoveCatapult(Board board, int targetRow, int targetCol){
         int rowDiff = row - targetRow;
         int colDiff = col - targetCol;
@@ -216,7 +278,15 @@ public class Piece {
         }
     }
 
-    /** Blinker unit can teleport to the neighbor tiles of a friendly piece; CANNOT attack.*/
+    /**
+     * Blinker can move to the neighbor square (4 Cardinal, 4 Intercardinal) of a friendly Piece.
+     *
+     * @param board
+     * @param targetRow
+     * @param targetCol
+     * @return true if Blinker can move to target coordinate according to its basic movement rules.
+     *
+     */
     public boolean isValidMoveBlinker(Board board, int targetRow, int targetCol){
         Piece targetPiece = board.getTile(targetRow, targetCol).getPiece();
         if (targetPiece != null){ /* cannot move to tile occupied by either a friendly piece or an enemy piece*/
@@ -226,10 +296,35 @@ public class Piece {
         return neighborTilesScan(board, targetRow, targetCol, 1);
     }
 
-    private boolean isPositionInBound(Board board, int targetRow, int targetCol){
+    /**
+     *
+     * @param board
+     * @param targetRow
+     * @param targetCol
+     * @return true if target position in inside board boundary.
+     */
+    private boolean isLocationInBound(Board board, int targetRow, int targetCol){
         return targetRow >= 0 && targetRow < board.getWidth() && targetCol >= 0 && targetCol < board.getHeight();
     }
 
+    /**
+     *
+     * @param targetRow
+     * @param targetCol
+     * @return true if target position is the same as current position.
+     */
+    private boolean isTargetLocationSameAsCurrentLocation(int targetRow, int targetCol){
+        return row == targetRow && col == targetCol;
+    }
+
+    /**
+     *
+     *
+     * @param targetRow
+     * @param targetCol
+     * @return true if target coordinate is different from current coordinate (aka. the Piece does not stay in current position
+     * for the move).
+     */
     private boolean isTileOccupiedByFriendlyPiece(Board board, int targetRow, int targetCol){
         Piece targetPiece = board.getTile(targetRow, targetCol).getPiece();
         if (targetPiece != null && targetPiece.getPlayerNumber() == playerNumber){
@@ -238,6 +333,13 @@ public class Piece {
         return false;
     }
 
+    /**
+     *
+     * @param board
+     * @param targetRow
+     * @param targetCol
+     * @return true if target coordinate is occupied by a Piece
+     */
     private boolean isTileOccupiedByPiece(Board board, int targetRow, int targetCol){
         Piece targetPiece = board.getTile(targetRow, targetCol).getPiece();
         if (targetPiece != null) {
@@ -246,16 +348,25 @@ public class Piece {
         return false;
     }
 
-    /** Scan neighboring 8 tiles for given location
-     * mode = 0: true if at least one tile is empty
-     * mode = 1: true if at least one tile is occupied by a friendly piece other than self*/
+    /**
+     * mode = 0: true if at least one neighbor tile of the target coordinate is empty.
+     *
+     * mode = 1: true if at least one neighbor tile of the target coordinate
+     * is occupied by a friendly Piece (other than the Blinker itself).
+     *
+     * @param board
+     * @param targetRow
+     * @param targetCol
+     * @param mode 0 or 1
+     * @return boolean depending on mode
+     */
     private boolean neighborTilesScan(Board board, int targetRow, int targetCol, int mode){
         int[] neighborRows = new int[]{targetRow - 1, targetRow, targetRow + 1, targetRow - 1, targetRow + 1, targetRow - 1, targetRow, targetRow + 1};
         int[] neighborCols = new int[]{targetCol - 1, targetCol - 1, targetCol - 1, targetCol, targetCol, targetCol + 1, targetCol + 1, targetCol + 1};
         for (int i = 0; i < 8; i ++) {
             int neighborRow = neighborRows[i];
             int neighborCol = neighborCols[i];
-            if (!isPositionInBound(board, neighborRow, neighborCol)){
+            if (!isLocationInBound(board, neighborRow, neighborCol)){
                 continue;
             }
             if (mode == 0 && !isTileOccupiedByPiece(board, neighborRow, neighborCol)){
@@ -269,14 +380,24 @@ public class Piece {
     }
 
 
-
-
-    /*=======================Do I have Valid Move?===========================*/
+    /**
+     * Used in all Pieces.
+     *
+     * Generic function overridden by each individual Piece.
+     *
+     * @param board
+     * @return true if Piece has any valid move.
+     */
     public boolean hasValidMove(Board board){
         return true;
     }
 
-    /* used in Model.Piece.Bishop and Model.Piece.Queen, and other long ranged unit moving diagonally*/
+    /**
+     * Used in Model.Pieces.Bishop, Model.Pieces.Queen.
+     *
+     * @param board
+     * @return true if the Piece has valid diagonal move.
+     */
     public boolean hasValidMoveDiagonal(Board board){
         Tile currTile = board.getTile(row, col);
         int boardLength = Math.min(board.getWidth(), board.getHeight());
@@ -291,7 +412,12 @@ public class Piece {
         return false;
     }
 
-    /* used in Model.Piece.Rook and Model.Piece.Queen, and other long ranged unit moving horizontally / vertically */
+    /**
+     * Used in Model.Pieces.Rook, Model.Pieces.Queen, Model.Pieces.Catapult
+     *
+     * @param board
+     * @return true if the Piece has valid horizontal / diagonal move.
+     */
     public boolean hasValidMoveHorizontalVertical(Board board){
         Tile currTile = board.getTile(row, col);
         int boardWidth = board.getWidth();
@@ -309,7 +435,12 @@ public class Piece {
         return false;
     }
 
-    /* used in Model.Piece.Knight*/
+    /**
+     * Used in Model.Pieces.Knight
+     *
+     * @param board
+     * @return true if the Piece has valid knight jump move.
+     */
     public boolean hasValidMoveKnightJump(Board board){
         Tile currTile = board.getTile(row, col);
         int[] targetRowsLong = new int[]{row - 2, row + 2};
@@ -321,6 +452,12 @@ public class Piece {
         return false;
     }
 
+    /**
+     * Used in Model.Pieces.Catapult
+     *
+     * @param board
+     * @return true if the Piece has valid Catapult move.
+     */
     public boolean hasValidMoveCatapult(Board board){
         int boardWidth = board.getWidth();
         int boardHeight = board.getHeight();
@@ -338,6 +475,12 @@ public class Piece {
     }
 
 
+    /**
+     * Used in Model.Pieces.Blinker
+     *
+     * @param board
+     * @return true if the Piece has valid Blinker move.
+     */
     public boolean hasValidMoveBlinker(Board board){
         int boardWidth = board.getWidth();
         int boardHeight = board.getHeight();
@@ -352,228 +495,21 @@ public class Piece {
 
     }
 
-    public boolean hasValidMoveInGivenRowColArrays(Board board, int[] targetRows, int[] targetColsShort) {
+
+    /**
+     *
+     * @param board
+     * @return true if the Piece has valid move to target locations specified in targetRows and targetCols
+     */
+    public boolean hasValidMoveInGivenRowColArrays(Board board, int[] targetRows, int[] targetCols) {
         for (int targetRow : targetRows) {
-            for (int targetCol : targetColsShort) {
+            for (int targetCol : targetCols) {
                 if (this.isValidMove(board, targetRow, targetCol)) {
                     return true;
                 }
             }
         }
         return false;
-    }
-
-
-
-    /*==========================Children of Model.Piece=======================*/
-    public static class Pawn extends Piece{
-
-        public Pawn (int row, int col, int playerNumber){
-            super(row, col, playerNumber);
-            setPieceName("Pawn");
-        }
-
-        @Override
-        public boolean isValidMove(Board board, int targetRow, int targetCol) {
-            if (!super.isValidMove(board, targetRow, targetCol)){
-                return false;
-            }
-            int rowDiff = Math.abs(row - targetRow);
-            int colDiff = Math.abs(col - targetCol);
-            Tile[][] tiles = board.getTiles();
-            boolean valid = true;
-
-            /* test if way is blocked (only possible at inital 2 steps move) */
-            if (rowDiff == 2) {
-                if (playerNumber == 0 && row == 1) {
-                    valid = !tiles[row + 1][col].isOccupied() && colDiff == 0;
-                } else if (playerNumber == 1 && row == 6) {
-                    valid = !tiles[row - 1][col].isOccupied() && colDiff == 0;
-                } else return false; /* 2 steps move is only possible at initial position, row = 1 or 6*/
-            }
-            else {
-                if (playerNumber == 0) {
-                    valid = (targetRow - row) == 1;
-                }
-                else{
-                    valid = (row - targetRow) == 1;
-                }
-            }
-
-            if (col != targetCol){
-                valid = valid && (colDiff == 1) && tiles[targetRow][targetCol].isOccupied(); /* can only move diagonally to capture */
-            }
-
-
-            return valid;
-        }
-
-        @Override
-        public boolean hasValidMove(Board board){
-            int[] targetRows = new int[]{row - 2, row - 1, row, row + 1, row + 2};
-            int[] targetCols = new int[]{col - 1, col, col + 1};
-            return hasValidMoveInGivenRowColArrays(board, targetRows, targetCols);
-        }
-    }
-
-    public static class Bishop extends Piece{
-        public Bishop(int row, int col, int playerNumber){
-            super(row, col, playerNumber);
-            setPieceName("Bishop");
-        }
-
-        @Override
-        public boolean isValidMove(Board board, int targetRow, int targetCol) {
-            if (!super.isValidMove(board, targetRow, targetCol)){
-                return false;
-            }
-            return isValidMoveDiagonal(board, targetRow, targetCol);
-        }
-
-        @Override
-        public boolean hasValidMove(Board board){
-            return hasValidMoveDiagonal(board);
-        }
-    }
-
-    public static class Rook extends Piece{
-        public Rook(int row, int col, int playerNumber){
-            super(row, col, playerNumber);
-            setPieceName("Rook");
-        }
-
-        @Override
-        public boolean isValidMove(Board board, int targetRow, int targetCol) {
-            if (!super.isValidMove(board, targetRow, targetCol)){
-                return false;
-            }
-            return isValidMoveHorizontalVertical(board, targetRow, targetCol);
-        }
-        @Override
-        public boolean hasValidMove(Board board){
-            return hasValidMoveHorizontalVertical(board);
-        }
-    }
-
-    public static class King extends Piece{
-        public King (int row, int col, int playerNumber){
-            super(row, col, playerNumber);
-            setPieceName("King");
-        }
-
-        @Override
-        public boolean isValidMove(Board board, int targetRow, int targetCol) {
-            if (!super.isValidMove(board, targetRow, targetCol)){
-                return false;
-            }
-            int rowDiff = Math.abs(row - targetRow);
-            int colDiff = Math.abs(col - targetCol);
-            if (rowDiff > 1 || colDiff > 1){
-                return false;
-            }
-
-            return true;
-        }
-
-        @Override
-        public boolean hasValidMove(Board board){
-            Tile currTile = board.getTile(row, col);
-            int[] targetRows = new int[]{row - 1, row, row + 1};
-            int[] targetCols = new int[]{col - 1, col, col + 1};
-            return hasValidMoveInGivenRowColArrays(board, targetRows, targetCols);
-        }
-    }
-
-
-    public static class Queen extends Piece {
-        public Queen(int row, int col, int playerNumber) {
-            super(row, col, playerNumber);
-            setPieceName("Queen");
-        }
-
-        @Override
-        public boolean isValidMove(Board board, int targetRow, int targetCol) {
-            if (!super.isValidMove(board, targetRow, targetCol)) {
-                return false;
-            }
-            return isValidMoveDiagonal(board, targetRow, targetCol) || isValidMoveHorizontalVertical(board, targetRow, targetCol);
-        }
-
-        @Override
-        public boolean hasValidMove(Board board) {
-            return hasValidMoveDiagonal(board) || hasValidMoveHorizontalVertical(board);
-        }
-    }
-
-    public static class Knight extends Piece{
-        public Knight (int row, int col, int playerNumber){
-            super(row, col, playerNumber);
-            setPieceName("Knight");
-        }
-
-        @Override
-        public boolean isValidMove(Board board, int targetRow, int targetCol) {
-            if (!super.isValidMove(board, targetRow, targetCol)){
-                return false;
-            }
-            int rowDiff = Math.abs(row - targetRow);
-            int colDiff = Math.abs(col - targetCol);
-            if ((rowDiff == 1 && colDiff == 2) || (rowDiff == 2 && colDiff == 1)){
-                return true;
-            }
-            return false;
-        }
-
-        @Override
-        public boolean hasValidMove(Board board){
-            return hasValidMoveKnightJump(board);
-        }
-    }
-
-    /** Catapult: horizontal / vertical move on unblocked path;
-     * when trying to capture, need to have one (and only one) middle piece to jump over*/
-    public static class Catapult extends Piece{
-        public Catapult (int row, int col, int playerNumber){
-            super(row, col, playerNumber);
-            setPieceName("Catapult");
-        }
-
-        @Override
-        public boolean isValidMove(Board board, int targetRow, int targetCol) {
-            if (!super.isValidMove(board, targetRow, targetCol)) {
-                return false;
-            }
-            return isValidMoveCatapult(board, targetRow, targetCol);
-        }
-
-        @Override
-        public boolean hasValidMove(Board board){
-            return hasValidMoveCatapult(board);
-        }
-
-    }
-    /** Blinker: can teleport to the neighbor tiles of a friendly piece;
-     * cannot attack.*/
-    public static class Blinker extends Piece {
-        public Blinker (int row, int col, int playerNumber){
-            super(row, col, playerNumber);
-            setPieceName("Blinker");
-        }
-
-        @Override
-        public boolean isValidMove(Board board, int targetRow, int targetCol) {
-            if (!super.isValidMove(board, targetRow, targetCol)) {
-                return false;
-            }
-            return isValidMoveBlinker(board, targetRow, targetCol);
-        }
-
-        @Override
-        public boolean hasValidMove(Board board){
-            return hasValidMoveBlinker(board);
-        }
-
-
     }
 
 

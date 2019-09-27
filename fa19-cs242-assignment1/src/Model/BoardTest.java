@@ -87,6 +87,7 @@ public class BoardTest {
         Piece testQueen0 = testBoard.getTile(0, 3).getPiece();
         testBoard.movePieceByPiece(testQueen1, 5, 5);
         testBoard.movePieceByPiece(testQueen0, 7, 3);
+        testBoard.printBoard();
 
         assertTrue(testBoard.isInCheck());
         Piece testKing1 = testBoard.getTile(7, 4).getPiece();
