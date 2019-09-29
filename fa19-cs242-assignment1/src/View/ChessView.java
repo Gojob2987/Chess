@@ -40,24 +40,35 @@ public class ChessView implements ActionListener{
     private ImageIcon QueenLight = createImageIcon("../Asset/Chess_qlt60.png");
     private ImageIcon RookLight = createImageIcon("../Asset/Chess_rlt60.png");
 
-
-    private JButton startButton = new JButton("Game Start");
+    private JPanel mainPanel;
+    private JPanel utilityPanel;
+    private JPanel boardPanel;
+    private JButton gameStartButton = new JButton("Game Start");
     private JButton showScoreButton = new JButton("Player Scores");
 
 
     public ChessView(){
         JFrame gameWindow = new JFrame("Chess GUI");
-        gameWindow.setSize(800, 800);
+        gameWindow.setSize(1024, 1024);
+        mainPanel = initMainPanel();
+        utilityPanel = initUtilityPanel();
+        boardPanel = initBoardPanel();
+
+        /*
+        gameStartButton.setPreferredSize(new Dimension(64, 64));
+        showScoreButton.setPreferredSize(new Dimension(64, 64));
+
+         */
+        mainPanel.add(utilityPanel, BorderLayout.EAST);
+
+
         JButton[][] boardTileButtons = initBoardTileButtons();
-        JPanel mainPanel = initMainPanel();
-        JPanel boardPanel = initBoardPanel();
-        /* initButtons(mainPanel); */
-        mainPanel.add(showScoreButton, BorderLayout.EAST);
         for (int i = 0; i < 8; i ++){
             for (int j = 0; j < 8; j ++){
                 boardPanel.add(boardTileButtons[i][j]);
             }
         }
+
         mainPanel.add(boardPanel);
         /* setUpMenu(gameWindow); */
         gameWindow.setContentPane(mainPanel);
@@ -65,38 +76,48 @@ public class ChessView implements ActionListener{
         gameWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    /*
-    private void initButtons(JPanel myPanel) {
-        startButton.addActionListener(this);
-        myPanel.add(startButton, BorderLayout.EAST);
-    }
 
+     public void addGameStartListener(ActionListener s){
+        gameStartButton.addActionListener(s);
+     }
+
+
+    /**
+     * Called in Control.ChessController
+     *
+     * @param s
      */
-
-    public void setScore(String scoreString){
-        showScoreButton.setText(scoreString);
+    public void addShowScoreListener(ActionListener s){
+        showScoreButton.addActionListener(s);
     }
 
-    public void addShowScoreListener(ActionListener showScore){
-        showScoreButton.addActionListener(showScore);
+    public void showScoreWindow(int player0Score, int player1Score){
+        JFrame scoreWindow = new JFrame();
+        scoreWindow.setSize(150, 150);
+        JPanel scorePanel = new JPanel();
+        JLabel scoreLabel0 = new JLabel("Player0 score: " + player0Score);
+        JLabel scoreLabel1 = new JLabel("Player1 score: " + player1Score);
+        scorePanel.add(scoreLabel0);
+        scorePanel.add(scoreLabel1);
+        scoreWindow.setContentPane(scorePanel);
+        scoreWindow.setVisible(true);
+        scoreWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
-
 
     private JButton[][] initBoardTileButtons(){
         JButton[][] boardButtons = new JButton[8][8];
         for (int i = 0; i < 8; i ++){
             for (int j = 0; j < 8; j ++){
-                JButton tile = new JButton();
-                tile.setPreferredSize(new Dimension(64, 64));
+                JButton tileButton = new JButton();
                 if (i % 2 == j % 2){
-                    tile.setBackground(Color.WHITE);
+                    tileButton.setBackground(Color.WHITE);
                 }
                 else{
-                    tile.setBackground(Color.GRAY);
+                    tileButton.setBackground(Color.GRAY);
                 }
-                tile.setOpaque(true);
-                tile.setBorderPainted(false);
-                boardButtons[i][j] = tile;
+                tileButton.setOpaque(true);
+                tileButton.setBorderPainted(false);
+                boardButtons[i][j] = tileButton;
             }
         }
 
@@ -140,9 +161,18 @@ public class ChessView implements ActionListener{
 
     private JPanel initMainPanel() {
         JPanel mainPanel = new JPanel();
-        mainPanel.setPreferredSize(new Dimension(720,720));
+        mainPanel.setPreferredSize(new Dimension(1024,1024));
         mainPanel.setLayout(new BorderLayout());
         return mainPanel;
+    }
+
+    private JPanel initUtilityPanel(){
+        JPanel utilityPanel = new JPanel();
+        utilityPanel.setLayout(new BoxLayout(utilityPanel, BoxLayout.Y_AXIS));
+        utilityPanel.setPreferredSize(new Dimension(300,1024));
+        utilityPanel.add(gameStartButton);
+        utilityPanel.add(showScoreButton);
+        return utilityPanel;
     }
 
     private JPanel initBoardPanel(){

@@ -13,14 +13,24 @@ import java.awt.event.ActionListener;
  */
 
 public class ChessController {
-    private Board board;
-    private ChessView view;
+    private static Board board;
+    private static ChessView view;
 
     public ChessController(Board board, ChessView view){
         this.board = board;
         this.view = view;
 
+        view.addGameStartListener(new GameStartListener());
         view.addShowScoreListener(new ShowScoreListener());
+
+    }
+
+
+    class GameStartListener implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent e){
+            board.gameStart();
+        }
     }
 
     class ShowScoreListener implements ActionListener{
@@ -28,9 +38,9 @@ public class ChessController {
         public void actionPerformed(ActionEvent e) {
             int player0Score = board.getPlayer0Score();
             int player1Score = board.getPlayer1Score();
-            String scoreString = "player0 score: " + player0Score + "; player1 score: " + player1Score;
-            view.setScore(scoreString);
+            view.showScoreWindow(player0Score, player1Score);
         }
     }
+
 
 }

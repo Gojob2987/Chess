@@ -213,15 +213,15 @@ public class Board {
 
     /* King is in Check and there is no legal move*/
     public boolean isCheckmate(){
-        return isInCheck() && !hasValidMoveForPieces();
+        return isInCheck() && !hasValidMoveInMyTurn();
     }
 
 
     public boolean isStalemate(){
-        return (!isInCheck()) && !hasValidMoveForPieces();
+        return (!isInCheck()) && !hasValidMoveInMyTurn();
     }
 
-    public boolean hasValidMoveForPieces(){
+    public boolean hasValidMoveInMyTurn(){
         List<Piece> myPieces = (playerTurn == 0) ? player0Pieces : player1Pieces;
         for (Piece myPiece : myPieces){
             if (myPiece.hasValidMove(this)){
@@ -289,11 +289,16 @@ public class Board {
 
     public void movePieceByPiece(Piece myPiece, int targetRow, int targetCol){
         if (myPiece == null) {
-            System.out.println("Please select the Model.Piece you want to move");
+            System.out.println("Please select the Piece you want to move");
             return;
         }
         movePieceByPosition(myPiece.getRow(), myPiece.getCol(), targetRow, targetCol);
     }
 
+
+    /*========================GAME LOOP=========================*/
+    public void gameStart(){
+
+    }
 
 }
