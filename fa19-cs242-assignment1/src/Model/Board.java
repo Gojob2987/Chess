@@ -16,6 +16,8 @@ public class Board {
     private static boolean gameover;
     private static List<Piece> player0Pieces;
     private static List<Piece> player1Pieces;
+    private static int player0Score = 0;
+    private static int player1Score = 0;
 
     public Board(String boardMode){
         if ("normal".equals(boardMode)) {
@@ -53,8 +55,15 @@ public class Board {
     public int getPlayerTurn(){
         return playerTurn;
     }
+    public int getPlayer0Score(){return player0Score;}
+    public void setPlayer0Score(int score){player0Score = score;}
+    public int getPlayer1Score(){return player1Score;}
+    public void setPlayer1Score(int score){player1Score = score;}
     public void changePlayerTurn(){
         playerTurn = (playerTurn + 1) % 2;
+    }
+    public boolean getGameOver(){
+        return gameover;
     }
     public void setGameover(){
         gameover = true;
@@ -226,7 +235,7 @@ public class Board {
 
     /*==========================HOW A SINGLE TURN IS DONE=======================*/
 
-    public void movePieceByLocation(int currRow, int currCol, int targetRow, int targetCol){
+    public void movePieceByPosition(int currRow, int currCol, int targetRow, int targetCol){
         if (isCheckmate()){
             System.out.println("Player " + playerTurn + "lost due to Checkmate");
             this.setGameover();
@@ -283,7 +292,7 @@ public class Board {
             System.out.println("Please select the Model.Piece you want to move");
             return;
         }
-        movePieceByLocation(myPiece.getRow(), myPiece.getCol(), targetRow, targetCol);
+        movePieceByPosition(myPiece.getRow(), myPiece.getCol(), targetRow, targetCol);
     }
 
 

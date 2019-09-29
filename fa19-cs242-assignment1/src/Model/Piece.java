@@ -55,9 +55,9 @@ public class Piece {
      *
      * Various fundamental move tests are performed:
      *
-     * {@link #isLocationInBound(Board, int, int)}
+     * {@link #isPositionInBound(Board, int, int)}
      *
-     * {@link #isTargetLocationSameAsCurrentLocation(int, int)}
+     * {@link #isTargetPositionSameAsCurrentPosition(int, int)}
      *
      * {@link #isTileOccupiedByFriendlyPiece(Board, int, int)}
      *
@@ -73,13 +73,13 @@ public class Piece {
         boolean printErrorMsg = board.getPrintErrorMsg();
 
 
-        if (!isLocationInBound(board, targetRow, targetCol)){
+        if (!isPositionInBound(board, targetRow, targetCol)){
             if (printErrorMsg){
                 System.out.println("Illegal move: out of board bound");
             }
             return false;
         }
-        if (isTargetLocationSameAsCurrentLocation(targetRow, targetCol)){
+        if (isTargetPositionSameAsCurrentPosition(targetRow, targetCol)){
             if (printErrorMsg){
                 System.out.println("Illegal move: staying at current position");
             }
@@ -303,7 +303,7 @@ public class Piece {
      * @param targetCol
      * @return true if target position in inside board boundary.
      */
-    private boolean isLocationInBound(Board board, int targetRow, int targetCol){
+    private boolean isPositionInBound(Board board, int targetRow, int targetCol){
         return targetRow >= 0 && targetRow < board.getWidth() && targetCol >= 0 && targetCol < board.getHeight();
     }
 
@@ -313,7 +313,7 @@ public class Piece {
      * @param targetCol
      * @return true if target position is the same as current position.
      */
-    private boolean isTargetLocationSameAsCurrentLocation(int targetRow, int targetCol){
+    private boolean isTargetPositionSameAsCurrentPosition(int targetRow, int targetCol){
         return row == targetRow && col == targetCol;
     }
 
@@ -366,7 +366,7 @@ public class Piece {
         for (int i = 0; i < 8; i ++) {
             int neighborRow = neighborRows[i];
             int neighborCol = neighborCols[i];
-            if (!isLocationInBound(board, neighborRow, neighborCol)){
+            if (!isPositionInBound(board, neighborRow, neighborCol)){
                 continue;
             }
             if (mode == 0 && !isTileOccupiedByPiece(board, neighborRow, neighborCol)){
@@ -499,7 +499,7 @@ public class Piece {
     /**
      *
      * @param board
-     * @return true if the Piece has valid move to target locations specified in targetRows and targetCols
+     * @return true if the Piece has valid move to target positions specified in targetRows and targetCols
      */
     public boolean hasValidMoveInGivenRowColArrays(Board board, int[] targetRows, int[] targetCols) {
         for (int targetRow : targetRows) {

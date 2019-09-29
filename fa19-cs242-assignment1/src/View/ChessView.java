@@ -1,21 +1,11 @@
 package View;
 
-import Model.Piece;
-
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
+import javax.swing.*;
+
 import java.net.URL;
 
-import javax.swing.*;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.ImageIcon;
 
 /** Sample code from: https://wiki.illinois.edu/wiki/display/cs242/Assignment+1.1
  *
@@ -35,18 +25,37 @@ import javax.swing.ImageIcon;
  *
  * */
 
-public class ChessGUI implements ActionListener{
+public class ChessView implements ActionListener{
 
-    public ChessGUI(){
-        JFrame gameWindow = new JFrame("Chessboard GUI");
+    private ImageIcon BishopDark = createImageIcon("../Asset/Chess_bdt60.png");
+    private ImageIcon PawnDark = createImageIcon("../Asset/Chess_pdt60.png");
+    private ImageIcon KingDark = createImageIcon("../Asset/Chess_kdt60.png");
+    private ImageIcon KnightDark = createImageIcon("../Asset/Chess_ndt60.png");
+    private ImageIcon QueenDark = createImageIcon("../Asset/Chess_qdt60.png");
+    private ImageIcon RookDark = createImageIcon("../Asset/Chess_rdt60.png");
+    private ImageIcon BishopLight = createImageIcon("../Asset/Chess_blt60.png");
+    private ImageIcon PawnLight = createImageIcon("../Asset/Chess_plt60.png");
+    private ImageIcon KingLight = createImageIcon("../Asset/Chess_klt60.png");
+    private ImageIcon KnightLight = createImageIcon("../Asset/Chess_nlt60.png");
+    private ImageIcon QueenLight = createImageIcon("../Asset/Chess_qlt60.png");
+    private ImageIcon RookLight = createImageIcon("../Asset/Chess_rlt60.png");
+
+
+    private JButton startButton = new JButton("Game Start");
+    private JButton showScoreButton = new JButton("Player Scores");
+
+
+    public ChessView(){
+        JFrame gameWindow = new JFrame("Chess GUI");
         gameWindow.setSize(800, 800);
-        JButton[][] boardButtons = initializeBoardButtons();
-        JPanel mainPanel = initializeMainPanel();
-        JPanel boardPanel = initializeBoardPanel();
-        /* initializeButton(mainPanel); */
+        JButton[][] boardTileButtons = initBoardTileButtons();
+        JPanel mainPanel = initMainPanel();
+        JPanel boardPanel = initBoardPanel();
+        /* initButtons(mainPanel); */
+        mainPanel.add(showScoreButton, BorderLayout.EAST);
         for (int i = 0; i < 8; i ++){
             for (int j = 0; j < 8; j ++){
-                boardPanel.add(boardButtons[i][j]);
+                boardPanel.add(boardTileButtons[i][j]);
             }
         }
         mainPanel.add(boardPanel);
@@ -57,15 +66,23 @@ public class ChessGUI implements ActionListener{
     }
 
     /*
-    private void initializeButton(JPanel myPanel) {
-        JButton startButton = new JButton("Game Start");
+    private void initButtons(JPanel myPanel) {
         startButton.addActionListener(this);
         myPanel.add(startButton, BorderLayout.EAST);
     }
 
      */
 
-    private JButton[][] initializeBoardButtons(){
+    public void setScore(String scoreString){
+        showScoreButton.setText(scoreString);
+    }
+
+    public void addShowScoreListener(ActionListener showScore){
+        showScoreButton.addActionListener(showScore);
+    }
+
+
+    private JButton[][] initBoardTileButtons(){
         JButton[][] boardButtons = new JButton[8][8];
         for (int i = 0; i < 8; i ++){
             for (int j = 0; j < 8; j ++){
@@ -83,18 +100,6 @@ public class ChessGUI implements ActionListener{
             }
         }
 
-        ImageIcon BishopDark = createImageIcon("../Asset/Chess_bdt60.png");
-        ImageIcon PawnDark = createImageIcon("../Asset/Chess_pdt60.png");
-        ImageIcon KingDark = createImageIcon("../Asset/Chess_kdt60.png");
-        ImageIcon KnightDark = createImageIcon("../Asset/Chess_ndt60.png");
-        ImageIcon QueenDark = createImageIcon("../Asset/Chess_qdt60.png");
-        ImageIcon RookDark = createImageIcon("../Asset/Chess_rdt60.png");
-        ImageIcon BishopLight = createImageIcon("../Asset/Chess_blt60.png");
-        ImageIcon PawnLight = createImageIcon("../Asset/Chess_plt60.png");
-        ImageIcon KingLight = createImageIcon("../Asset/Chess_klt60.png");
-        ImageIcon KnightLight = createImageIcon("../Asset/Chess_nlt60.png");
-        ImageIcon QueenLight = createImageIcon("../Asset/Chess_qlt60.png");
-        ImageIcon RookLight = createImageIcon("../Asset/Chess_rlt60.png");
 
         for (int col = 0; col < 8; col ++) {
             boardButtons[1][col].setIcon(PawnDark);
@@ -133,14 +138,14 @@ public class ChessGUI implements ActionListener{
     }
 
 
-    private JPanel initializeMainPanel() {
+    private JPanel initMainPanel() {
         JPanel mainPanel = new JPanel();
         mainPanel.setPreferredSize(new Dimension(720,720));
         mainPanel.setLayout(new BorderLayout());
         return mainPanel;
     }
 
-    private JPanel initializeBoardPanel(){
+    private JPanel initBoardPanel(){
         JPanel boardPanel = new JPanel();
         boardPanel.setLayout(new GridLayout(0, 8));
         return boardPanel;
@@ -171,6 +176,6 @@ public class ChessGUI implements ActionListener{
 
 
     public static void main(String[] args) {
-        new ChessGUI();
+        new ChessView();
     }
 }
