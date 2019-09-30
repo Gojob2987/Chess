@@ -11,7 +11,7 @@ import java.net.URL;
 
 /** Sample code from: https://wiki.illinois.edu/wiki/display/cs242/Assignment+1.1
  *
- * Chess Pieces icon:
+ * Standard Chess Pieces icon:
  * By en:User:Cburnett - File:Chess bdt45.svg, CC BY-SA 3.0, https://commons.wikimedia.org/w/index.php?curid=20363776
  * By en:User:Cburnett - File:Chess blt45.svg, CC BY-SA 3.0, https://commons.wikimedia.org/w/index.php?curid=20363777
  * By en:User:Cburnett - File:Chess kdt45.svg, CC BY-SA 3.0, https://commons.wikimedia.org/w/index.php?curid=20363778
@@ -25,6 +25,21 @@ import java.net.URL;
  * By en:User:Cburnett - File:Chess rdt45.svg, CC BY-SA 3.0, https://commons.wikimedia.org/w/index.php?curid=20363786
  * By en:User:Cburnett - File:Chess rlt45.svg, CC BY-SA 3.0, https://commons.wikimedia.org/w/index.php?curid=20363775
  *
+ * Catapult-black Icon:
+ * <div>Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/"
+ *   title="Flaticon">www.flaticon.com</a></div>
+ *
+ * Catapult-white Icon:
+ * <div>Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/"
+ *  title="Flaticon">www.flaticon.com</a></div>
+ *
+ * Blinker-black Icon:
+ * https://dev.bukkit.org/projects/advanced-randomtp/files/2719636
+ *
+ * Blinker-white Icon:
+ * https://game-icons.net/1x1/lorc/transportation-rings.html
+ *
+ *
  * */
 
 public class ChessView implements ActionListener{
@@ -35,12 +50,16 @@ public class ChessView implements ActionListener{
     private static ImageIcon KnightDark = createImageIcon("../Asset/Chess_ndt60.png");
     private static ImageIcon QueenDark = createImageIcon("../Asset/Chess_qdt60.png");
     private static ImageIcon RookDark = createImageIcon("../Asset/Chess_rdt60.png");
+    private static ImageIcon CatapultDark = createImageIcon("../Asset/catapult_b.png");
+    private static ImageIcon BlinkerDark = createImageIcon("../Asset/blinker_b.png");
     private static ImageIcon BishopLight = createImageIcon("../Asset/Chess_blt60.png");
     private static ImageIcon PawnLight = createImageIcon("../Asset/Chess_plt60.png");
     private static ImageIcon KingLight = createImageIcon("../Asset/Chess_klt60.png");
     private static ImageIcon KnightLight = createImageIcon("../Asset/Chess_nlt60.png");
     private static ImageIcon QueenLight = createImageIcon("../Asset/Chess_qlt60.png");
     private static ImageIcon RookLight = createImageIcon("../Asset/Chess_rlt60.png");
+    private static ImageIcon CatapultLight = createImageIcon("../Asset/catapult_w.png");
+    private static ImageIcon BlinkerLight = createImageIcon("../Asset/blinker_w.png");
 
 
     private static JFrame gameWindow;
@@ -48,35 +67,39 @@ public class ChessView implements ActionListener{
     private static JPanel utilityPanel;
     private static JPanel boardPanel;
     private static JButton[][] boardButtons;
-    private static JButton gameStartButton;
     private static JButton gameRestartButton;
     private static JButton gameForfeitButton;
+    private static JButton gameWithSpecialUnitButton;
     private static JButton showScoreButton;
-    private static JButton showTurnButton;
+    private static JButton showPlayerTurnButton;
+    private static JButton showTotalTurnButton;
+    private static JButton undoMoveButton;
 
 
     public ChessView(){
-        initView();
+        initView("normal");
     }
 
-    public static void initView(){
+    public static void initView(String gameMode){
         gameWindow = new JFrame("Chess GUI");
-        mainPanel = new JPanel();
-        utilityPanel = new JPanel();
-        boardPanel = new JPanel();
-        boardButtons = new JButton[8][8];
-        gameStartButton = new JButton("Game Start");
-        gameRestartButton = new JButton("Game Restart");
-        gameForfeitButton = new JButton("Game Forfeit");
-        showScoreButton = new JButton("Player Scores");
-        showTurnButton = new JButton("Current Turn: ");
         gameWindow.setSize(1024, 1024);
 
-        initUtilityButtons();
+        initUtilityComponents();
         initMainPanel();
         initUtilityPanel();
         initBoardPanel();
-        initBoardButtons();
+
+        switch (gameMode){
+            case "normal":
+                initBoardButtonsNormal();
+                break;
+            case "special":
+                initBoardButtonsWithSpecialUnit();
+                break;
+            default:
+                System.out.println("Unknown game mode " + gameMode);
+                return;
+        }
 
         mainPanel.add(utilityPanel, BorderLayout.EAST);
         mainPanel.add(boardPanel);
@@ -86,15 +109,15 @@ public class ChessView implements ActionListener{
         gameWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    public static void resetView(){
+    public static void resetView(String gameMode){
         if (gameWindow.getContentPane() != null) {
             gameWindow.getContentPane().removeAll();
         }
-        initView();
+        initView(gameMode);
         gameWindow.revalidate();
     }
 
-    public static JButton getBoardTileButton(int row, int col){
+    public static JButton getBoardButton(int row, int col){
         return boardButtons[row][col];
     }
 
@@ -139,12 +162,15 @@ public class ChessView implements ActionListener{
 
     }
 
-    public static void setShowTurnButton(int playerTurn){
+
+    public static void setShowTurnButtons(int playerTurn, int totalTurn){
         String playerTurnColorString = (playerTurn == 0) ? "B" : "W";
-        showTurnButton.setText("Current Turn: " + playerTurn + " (" + playerTurnColorString + ")");
+        showPlayerTurnButton.setText("Current Turn: " + playerTurn + " (" + playerTurnColorString + ")");
+        showTotalTurnButton.setText("Total Turn: " + totalTurn);
     }
 
-    private static JButton[][] initBoardButtons(){
+    private static void initBoardButtonsPaintBackground(){
+        boardButtons = new JButton[8][8];
         for (int i = 0; i < 8; i ++){
             for (int j = 0; j < 8; j ++){
                 JButton boardButton = new JButton();
@@ -163,8 +189,10 @@ public class ChessView implements ActionListener{
                 boardPanel.add(boardButton);
             }
         }
+    }
 
-
+    private static void initBoardButtonsNormal(){
+        initBoardButtonsPaintBackground();
         for (int col = 0; col < 8; col ++) {
             boardButtons[1][col].setIcon(PawnDark);
             boardButtons[6][col].setIcon(PawnLight);
@@ -185,15 +213,34 @@ public class ChessView implements ActionListener{
         boardButtons[7][5].setIcon(BishopLight);
         boardButtons[7][6].setIcon(KnightLight);
         boardButtons[7][7].setIcon(RookLight);
-
-        return boardButtons;
     }
 
-    /* Sample code from: https://docs.oracle.com/javase/tutorial/uiswing/components/icon.html*/
+    private static void initBoardButtonsWithSpecialUnit(){
+        initBoardButtonsNormal();
+        boardButtons[0][0].setIcon(CatapultDark);
+        boardButtons[0][2].setIcon(BlinkerDark);
+        boardButtons[0][5].setIcon(BlinkerDark);
+        boardButtons[0][7].setIcon(CatapultDark);
+        boardButtons[7][0].setIcon(CatapultLight);
+        boardButtons[7][2].setIcon(BlinkerLight);
+        boardButtons[7][5].setIcon(BlinkerLight);
+        boardButtons[7][7].setIcon(CatapultLight);
+
+    }
+
+    /** Sample code from:
+     * https://docs.oracle.com/javase/tutorial/uiswing/components/icon.html
+     *
+     * and for resizing:
+     *  https://stackoverflow.com/questions/2856480/resizing-a-imageicon-in-a-jbutton
+     * */
     protected static ImageIcon createImageIcon(String path){
         URL imgURL = ChessView.class.getResource(path);
         if (imgURL != null){
-            return new ImageIcon(imgURL);
+            ImageIcon icon = new ImageIcon(imgURL);
+            Image img = icon.getImage();
+            Image newImg = img.getScaledInstance(64, 64, Image.SCALE_SMOOTH);
+            return new ImageIcon(newImg);
         }
         else{
             System.out.println("File at " + path + " could not be found");
@@ -203,31 +250,45 @@ public class ChessView implements ActionListener{
 
 
     private static JPanel initMainPanel() {
+        mainPanel = new JPanel();
         mainPanel.setPreferredSize(new Dimension(1024,1024));
         mainPanel.setLayout(new BorderLayout());
         return mainPanel;
     }
 
-    private static void initUtilityButtons(){
-        gameStartButton.addActionListener(new GameStartListener());
+    private static void initUtilityComponents(){
+        gameRestartButton = new JButton("Start/Restart (Normal)");
+        gameWithSpecialUnitButton = new JButton("Start/Restart (Special)");
+        gameForfeitButton = new JButton("Forfeit");
+        showScoreButton = new JButton("Display Player Scores");
+        undoMoveButton = new JButton("Undo");
+        showPlayerTurnButton = new JButton("Current Player Turn:");
+        showTotalTurnButton = new JButton("Total Turn:");
+
         gameRestartButton.addActionListener(new GameRestartListener());
         gameForfeitButton.addActionListener(new GameForfeitListener());
+        gameWithSpecialUnitButton.addActionListener(new GameStartWithSpecialUnitListener());
         showScoreButton.addActionListener(new ShowScoreListener());
+        undoMoveButton.addActionListener(new UndoMoveListener());
     }
 
 
     private static JPanel initUtilityPanel(){
+        utilityPanel = new JPanel();
         utilityPanel.setLayout(new BoxLayout(utilityPanel, BoxLayout.Y_AXIS));
         utilityPanel.setPreferredSize(new Dimension(300,1024));
-        utilityPanel.add(gameStartButton);
         utilityPanel.add(gameRestartButton);
         utilityPanel.add(gameForfeitButton);
+        utilityPanel.add(gameWithSpecialUnitButton);
         utilityPanel.add(showScoreButton);
-        utilityPanel.add(showTurnButton);
+        utilityPanel.add(undoMoveButton);
+        utilityPanel.add(showPlayerTurnButton);
+        utilityPanel.add(showTotalTurnButton);
         return utilityPanel;
     }
 
     private static JPanel initBoardPanel(){
+        boardPanel = new JPanel();
         boardPanel.setLayout(new GridLayout(0, 8));
         return boardPanel;
     }

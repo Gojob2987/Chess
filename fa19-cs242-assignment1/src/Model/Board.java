@@ -23,6 +23,9 @@ public class Board {
         if ("normal".equals(boardMode)) {
             initBoardNormal();
         }
+        else if ("special".equals(boardMode)){
+            initBoardWithSpecialUnit();
+        }
         else {
             System.out.println("Requested board shape: " + boardMode + " unimplemented");
             return;
@@ -54,6 +57,9 @@ public class Board {
     }
     public int getPlayerTurn(){
         return playerTurn;
+    }
+    public void setPlayerTurn(int playerTurn){
+        this.playerTurn = playerTurn;
     }
     public void changePlayerTurn(){
         playerTurn = (playerTurn + 1) % 2;
@@ -125,9 +131,17 @@ public class Board {
         /*printBoard();*/
     }
 
-    public void resetBoardNormal(){
-        initBoardNormal();
+    public void initBoardWithSpecialUnit() {
+        setWidth(8);
+        setHeight(8);
+        setTotalTurn(0);
+        initPlayerPiecesNormal();
+        initTilesNormal();
+        initPiecesWithSpecialUnit();
+        playerTurn = 0;
+
     }
+
 
     private void initPlayerPiecesNormal(){
         player0Pieces = new ArrayList<>(16);
@@ -149,6 +163,36 @@ public class Board {
         initPawnPiecesForPlayerAtRowNormal(0, 1, player0Pieces);
         initSpecialPiecesForPlayerAtRowNormal(1, 7, player1Pieces);
         initPawnPiecesForPlayerAtRowNormal(1, 6, player1Pieces);
+    }
+
+    private void initPiecesWithSpecialUnit(){
+        initSpecialPiecesForPlayerAtRowWithSpecialUnit(0, 0, player0Pieces);
+        initPawnPiecesForPlayerAtRowNormal(0, 1, player0Pieces);
+        initSpecialPiecesForPlayerAtRowWithSpecialUnit(1, 7, player1Pieces);
+        initPawnPiecesForPlayerAtRowNormal(1, 6, player1Pieces);
+
+    }
+
+    private void initSpecialPiecesForPlayerAtRowWithSpecialUnit(int playerNumber, int row, List<Piece> playerPieces){
+        Catapult catapult1 = new Catapult(row, 0, playerNumber);
+        Knight knight1 = new Knight(row, 1, playerNumber);
+        Blinker blinker1 = new Blinker(row, 2, playerNumber);
+        Queen queen = new Queen(row, 3, playerNumber);
+        King king = new King(row, 4, playerNumber);
+        Blinker blinker2 = new Blinker(row, 5, playerNumber);
+        Knight knight2 = new Knight(row, 6, playerNumber);
+        Catapult catapult2 = new Catapult(row, 7, playerNumber);
+
+        tiles[row][0].setPiece(catapult1);
+        tiles[row][1].setPiece(knight1);
+        tiles[row][2].setPiece(blinker1);
+        tiles[row][3].setPiece(queen);
+        tiles[row][4].setPiece(king);
+        tiles[row][5].setPiece(blinker2);
+        tiles[row][6].setPiece(knight2);
+        tiles[row][7].setPiece(catapult2);
+
+        playerPieces.addAll(Arrays.asList(catapult1, knight1, blinker1, queen, king, blinker2, knight2, catapult2));
     }
 
     private void initSpecialPiecesForPlayerAtRowNormal(int playerNumber, int row, List<Piece> playerPieces) {

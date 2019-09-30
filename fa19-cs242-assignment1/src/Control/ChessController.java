@@ -7,8 +7,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-import static org.junit.Assert.*;
-
 
 /**
  * Really helpful link for a basic ActionListener implemented in MVC pattern
@@ -23,15 +21,13 @@ public class ChessController {
     private static Board board;
     private static ChessView view;
     private static Color sourceColor;
-    private static Icon sourceIcon;
-    private static int targetRow, targetCol, sourceRow, sourceCol;
+    private static Icon sourceIcon, validTargetIcon, validSourceIcon;
+    private static int targetRow, targetCol, sourceRow, sourceCol, validTargetRow, validTargetCol, validSourceRow, validSourceCol;
+    private static Piece validTargetPiece;
+
     private static int player0Score = 0;
     private static int player1Score = 0;
 
-    public int getPlayer0Score(){return player0Score;}
-    public void setPlayer0Score(int score){player0Score = score;}
-    public int getPlayer1Score(){return player1Score;}
-    public void setPlayer1Score(int score){player1Score = score;}
 
     public enum GameState {
         INITIALIZED, PLAYING, PAUSED, SELECT_SOURCE, SELECT_TARGET, GAMEOVER;
@@ -47,20 +43,27 @@ public class ChessController {
     /**
      * Can try to start an individual game thread here in furture
      */
-    public static void gameInit(){
+    public static void gameInit() {
         board = new Board("normal");
         view = new ChessView();
         state = GameState.INITIALIZED;
     }
 
+
     public static void gameStart() {
         state = GameState.SELECT_SOURCE;
-        view.setShowTurnButton(board.getPlayerTurn());
+        view.setShowTurnButtons(board.getPlayerTurn(), board.getTotalTurn());
     }
 
-    public static void gameRestart(){
+    public static void gameRestart() {
         board = new Board("normal");
-        view.resetView();
+        view.resetView("normal");
+        gameStart();
+    }
+
+    public static void gameRestartWithSpecialUnit() {
+        board = new Board("special");
+        view.resetView("special");
         gameStart();
     }
 
@@ -68,8 +71,8 @@ public class ChessController {
         state = GameState.GAMEOVER;
         int playerTurn = board.getPlayerTurn();
         view.spawnGameOverWindow(gameOverString, playerTurn);
-        if (gameOverString.equals("Checkmate") || gameOverString.equals("Forfeit")){
-            switch (playerTurn){ /* current player is Checked by last player, or current player Forfeit*/
+        if (gameOverString.equals("Checkmate") || gameOverString.equals("Forfeit")) {
+            switch (playerTurn) { /* current player is Checked by last player, or current player Forfeit*/
                 case 0:
                     player1Score += 1;
                     break;
@@ -82,37 +85,52 @@ public class ChessController {
         }
     }
 
-    public static void gameForfeit(){
+    public static void gameForfeit() {
         gameOver("Forfeit");
     }
 
     public static void updateValidMoveOnView() {
-        JButton targetButton = view.getBoardTileButton(targetRow, targetCol);
-        targetButton.setIcon(sourceIcon);
+        validSourceRow = sourceRow;
+        validSourceCol = sourceCol;
+        validTargetRow = targetRow;
+        validTargetCol = targetCol;
+        validSourceIcon = sourceIcon;
 
-        JButton sourceButton = view.getBoardTileButton(sourceRow, sourceCol);
+        JButton validTargetButton = view.getBoardButton(targetRow, targetCol);
+        validTargetIcon = validTargetButton.getIcon();
+        validTargetButton.setIcon(sourceIcon);
+
+        JButton sourceButton = view.getBoardButton(sourceRow, sourceCol);
         sourceButton.setBackground(sourceColor);
         sourceButton.setIcon(null);
 
-        targetRow = targetCol = sourceRow = sourceCol = 0;
-        view.setShowTurnButton(board.getPlayerTurn());
+        view.setShowTurnButtons(board.getPlayerTurn(), board.getTotalTurn());
     }
 
+    /**
+     * Undo is only possible before your opponent makes a valid move
+     */
+    public static void undoValidMoveOnView() {
+        JButton validTargetButton = view.getBoardButton(validTargetRow, validTargetCol);
+        validTargetButton.setIcon(validTargetIcon);
+        JButton validSourceButton = view.getBoardButton(validSourceRow, validSourceCol);
+        validSourceButton.setIcon(validSourceIcon);
+        view.setShowTurnButtons(board.getPlayerTurn(), board.getTotalTurn());
+    }
+
+    public static void undoValidMoveOnBoard() {
+        board.getTile(validTargetRow, validTargetCol).moveBack(board, validTargetPiece, validSourceRow, validSourceCol);
+        board.setTotalTurn(board.getTotalTurn() - 1);
+        board.setPlayerTurn(1 - board.getPlayerTurn());
+    }
 
     public static void updateInvalidMoveOnView() {
-        JButton sourceButton = view.getBoardTileButton(sourceRow, sourceCol);
+        validTargetPiece = null;
+        JButton sourceButton = view.getBoardButton(sourceRow, sourceCol);
         sourceButton.setBackground(sourceColor);
         sourceButton.setIcon(sourceIcon);
-        targetRow = targetCol = sourceRow = sourceCol = 0;
     }
 
-
-    public static class GameStartListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            gameStart();
-        }
-    }
 
     public static class GameRestartListener implements ActionListener {
         @Override
@@ -128,6 +146,12 @@ public class ChessController {
         }
     }
 
+    public static class GameStartWithSpecialUnitListener implements  ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent e){
+            gameRestartWithSpecialUnit();
+        }
+    }
 
 
     public static class ShowScoreListener implements ActionListener {
@@ -162,7 +186,7 @@ public class ChessController {
                 case SELECT_SOURCE:
                     sourceRow = row;
                     sourceCol = col;
-                    JButton sourceButton = view.getBoardTileButton(sourceRow, sourceCol);
+                    JButton sourceButton = view.getBoardButton(sourceRow, sourceCol);
                     sourceColor = sourceButton.getBackground();
                     sourceIcon = sourceButton.getIcon();
                     sourceButton.setBackground(Color.CYAN);
@@ -174,6 +198,7 @@ public class ChessController {
                     targetCol = col;
 
                     int oldPlayerTurn = board.getPlayerTurn();
+                    validTargetPiece = board.getTile(targetRow, targetCol).getPiece(); /* not valid till we test in move*/
                     board.movePieceByPosition(sourceRow, sourceCol, targetRow, targetCol);
                     int newPlayerTurn = board.getPlayerTurn();
 
@@ -191,7 +216,7 @@ public class ChessController {
 
             if (board.isCheckmate()) {
                 gameOver("Checkmate");
-                switch (board.getPlayerTurn()){ /* current player is Checked by last player*/
+                switch (board.getPlayerTurn()) { /* current player is Checked by last player*/
                     case 0:
                         player1Score += 1;
                         break;
@@ -208,6 +233,12 @@ public class ChessController {
         }
     }
 
-
+    public static class UndoMoveListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            undoValidMoveOnBoard();
+            undoValidMoveOnView();
+        }
+    }
 
 }
