@@ -63,7 +63,6 @@ public class Tile {
     public void moveIn(Board board, Piece visitor){
         if (this.piece != null) {
             if (this.piece.getPieceName() == "Model.Piece.King") {
-                board.setGameover();
                 return;
             }
 

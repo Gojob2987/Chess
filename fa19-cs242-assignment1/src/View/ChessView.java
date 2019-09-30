@@ -1,5 +1,8 @@
 package View;
 
+import Control.ChessController;
+import Control.ChessController.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -40,11 +43,13 @@ public class ChessView implements ActionListener{
     private ImageIcon QueenLight = createImageIcon("../Asset/Chess_qlt60.png");
     private ImageIcon RookLight = createImageIcon("../Asset/Chess_rlt60.png");
 
-    private JPanel mainPanel;
-    private JPanel utilityPanel;
-    private JPanel boardPanel;
-    private JButton gameStartButton = new JButton("Game Start");
-    private JButton showScoreButton = new JButton("Player Scores");
+    private static JPanel mainPanel;
+    private static JPanel utilityPanel;
+    private static JPanel boardPanel;
+    private static JButton[][] boardTileButtons;
+    private static JButton gameStartButton = new JButton("Game Start");
+    private static JButton showScoreButton = new JButton("Player Scores");
+    private static JButton showTurnButton = new JButton("Current Turn: ");
 
 
     public ChessView(){
@@ -54,18 +59,19 @@ public class ChessView implements ActionListener{
         utilityPanel = initUtilityPanel();
         boardPanel = initBoardPanel();
 
-        /*
-        gameStartButton.setPreferredSize(new Dimension(64, 64));
-        showScoreButton.setPreferredSize(new Dimension(64, 64));
-
-         */
         mainPanel.add(utilityPanel, BorderLayout.EAST);
 
+        gameStartButton.addActionListener(new GameStartListener());
+        showScoreButton.addActionListener(new ShowScoreListener());
 
-        JButton[][] boardTileButtons = initBoardTileButtons();
+        boardTileButtons = initBoardTileButtons();
         for (int i = 0; i < 8; i ++){
             for (int j = 0; j < 8; j ++){
-                boardPanel.add(boardTileButtons[i][j]);
+                JButton boardTileButton = boardTileButtons[i][j];
+                boardTileButton.setActionCommand("" + i + "," + j);
+                boardTileButton.setText("");
+                boardTileButton.addActionListener(new MovePieceListener());
+                boardPanel.add(boardTileButton);
             }
         }
 
@@ -76,22 +82,12 @@ public class ChessView implements ActionListener{
         gameWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-
-     public void addGameStartListener(ActionListener s){
-        gameStartButton.addActionListener(s);
-     }
-
-
-    /**
-     * Called in Control.ChessController
-     *
-     * @param s
-     */
-    public void addShowScoreListener(ActionListener s){
-        showScoreButton.addActionListener(s);
+    public JButton getBoardTileButton(int row, int col){
+        return boardTileButtons[row][col];
     }
 
-    public void showScoreWindow(int player0Score, int player1Score){
+
+    public void spawnShowScoreWindow(int player0Score, int player1Score){
         JFrame scoreWindow = new JFrame();
         scoreWindow.setSize(150, 150);
         JPanel scorePanel = new JPanel();
@@ -102,6 +98,35 @@ public class ChessView implements ActionListener{
         scoreWindow.setContentPane(scorePanel);
         scoreWindow.setVisible(true);
         scoreWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    }
+
+    public void spawnGameOverWindow(String gameOverTypeString, int playerTurn){
+        JFrame gameOverWindow = new JFrame();
+        gameOverWindow.setSize(150, 150);
+        JPanel gameOverPanel = new JPanel();
+        JLabel gameOverStatementLabel = new JLabel("Game Over! " + gameOverTypeString);
+        JLabel gameOverResultLabel = new JLabel();
+        switch (gameOverTypeString){
+            case "Checkmate":
+                gameOverResultLabel.setText("Winner: Player" + (1 - playerTurn));
+                break;
+            case "Stalemate":
+                gameOverResultLabel.setText("Draw in Stalemate");
+                break;
+            default:
+                gameOverResultLabel.setText("Unknown end game condition (neither Checkmate nor Stalemate");
+        }
+        gameOverPanel.add(gameOverStatementLabel);
+        gameOverPanel.add(gameOverResultLabel);
+        gameOverWindow.setContentPane(gameOverPanel);
+        gameOverWindow.setVisible(true);
+        gameOverWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+    }
+
+    public void setShowTurnButton(int playerTurn){
+        String playerTurnColorString = (playerTurn == 0) ? "B" : "W";
+        showTurnButton.setText("Current Turn: " + playerTurn + " (" + playerTurnColorString + ")");
     }
 
     private JButton[][] initBoardTileButtons(){
@@ -172,6 +197,7 @@ public class ChessView implements ActionListener{
         utilityPanel.setPreferredSize(new Dimension(300,1024));
         utilityPanel.add(gameStartButton);
         utilityPanel.add(showScoreButton);
+        utilityPanel.add(showTurnButton);
         return utilityPanel;
     }
 
@@ -180,6 +206,7 @@ public class ChessView implements ActionListener{
         boardPanel.setLayout(new GridLayout(0, 8));
         return boardPanel;
     }
+
 
 /*
     private void setUpMenu(JFrame window) {

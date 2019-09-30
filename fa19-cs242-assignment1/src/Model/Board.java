@@ -1,10 +1,12 @@
 package Model;
 
 import Model.Pieces.*;
+import Control.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 
 public class Board {
     private int width = 0;
@@ -13,11 +15,9 @@ public class Board {
     private static int playerTurn; /* this is used interchangeably with player name in various printing*/
     private static int totalTurn;
     private static boolean printErrorMsg = false;
-    private static boolean gameover;
     private static List<Piece> player0Pieces;
     private static List<Piece> player1Pieces;
-    private static int player0Score = 0;
-    private static int player1Score = 0;
+
 
     public Board(String boardMode){
         if ("normal".equals(boardMode)) {
@@ -55,21 +55,18 @@ public class Board {
     public int getPlayerTurn(){
         return playerTurn;
     }
-    public int getPlayer0Score(){return player0Score;}
-    public void setPlayer0Score(int score){player0Score = score;}
-    public int getPlayer1Score(){return player1Score;}
-    public void setPlayer1Score(int score){player1Score = score;}
     public void changePlayerTurn(){
         playerTurn = (playerTurn + 1) % 2;
     }
+    /*
     public boolean getGameOver(){
         return gameover;
     }
     public void setGameover(){
         gameover = true;
         System.out.println("player " + playerTurn + " has defeated their foe, congratulation!");
-        /* do something to break the game loop */
     }
+    */
 
     public List<Piece> getPlayerPieces(int playerNumber){
         if (playerNumber == 0){
@@ -125,7 +122,6 @@ public class Board {
         initTilesNormal();
         initPiecesNormal();
         playerTurn = 0;
-        gameover = false;
         /*printBoard();*/
     }
 
@@ -238,12 +234,10 @@ public class Board {
     public void movePieceByPosition(int currRow, int currCol, int targetRow, int targetCol){
         if (isCheckmate()){
             System.out.println("Player " + playerTurn + "lost due to Checkmate");
-            this.setGameover();
             return;
         }
         if (isStalemate()){
             System.out.println("A draw occurs due to Stalemate");
-            this.setGameover();
             return;
         }
 
@@ -284,7 +278,6 @@ public class Board {
         /* change player turn */
         changePlayerTurn();
         setTotalTurn(totalTurn + 1);
-
     }
 
     public void movePieceByPiece(Piece myPiece, int targetRow, int targetCol){
@@ -296,9 +289,5 @@ public class Board {
     }
 
 
-    /*========================GAME LOOP=========================*/
-    public void gameStart(){
-
-    }
 
 }
