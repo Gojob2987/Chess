@@ -23,6 +23,7 @@ public class ChessController {
     private static Color sourceColor;
     private static Icon sourceIcon, validTargetIcon, validSourceIcon;
     private static int targetRow, targetCol, sourceRow, sourceCol, validTargetRow, validTargetCol, validSourceRow, validSourceCol;
+    private static boolean canUndo;
     private static Piece validTargetPiece;
 
     private static int player0Score = 0;
@@ -95,6 +96,7 @@ public class ChessController {
         validTargetRow = targetRow;
         validTargetCol = targetCol;
         validSourceIcon = sourceIcon;
+        canUndo = true;
 
         JButton validTargetButton = view.getBoardButton(targetRow, targetCol);
         validTargetIcon = validTargetButton.getIcon();
@@ -216,16 +218,6 @@ public class ChessController {
 
             if (board.isCheckmate()) {
                 gameOver("Checkmate");
-                switch (board.getPlayerTurn()) { /* current player is Checked by last player*/
-                    case 0:
-                        player1Score += 1;
-                        break;
-                    case 1:
-                        player0Score += 1;
-                        break;
-                    default:
-                        System.out.println("Unknown player number has won: " + board.getPlayerTurn());
-                }
             } else if (board.isStalemate()) {
                 gameOver("Stalemate");
             }
@@ -236,8 +228,11 @@ public class ChessController {
     public static class UndoMoveListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            undoValidMoveOnBoard();
-            undoValidMoveOnView();
+            if (canUndo) {
+                undoValidMoveOnBoard();
+                undoValidMoveOnView();
+            }
+            canUndo = false;
         }
     }
 

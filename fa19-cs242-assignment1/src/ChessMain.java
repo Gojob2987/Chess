@@ -9,7 +9,6 @@ public class ChessMain{
 
     public static void main(String[] args){
         ChessController controller = new ChessController();
-
     }
 
 

@@ -67,9 +67,9 @@ public class ChessView implements ActionListener{
     private static JPanel utilityPanel;
     private static JPanel boardPanel;
     private static JButton[][] boardButtons;
-    private static JButton gameRestartButton;
+    private static JButton gameStartButton;
     private static JButton gameForfeitButton;
-    private static JButton gameWithSpecialUnitButton;
+    private static JButton gameStartWithSpecialUnitButton;
     private static JButton showScoreButton;
     private static JButton showPlayerTurnButton;
     private static JButton showTotalTurnButton;
@@ -257,17 +257,17 @@ public class ChessView implements ActionListener{
     }
 
     private static void initUtilityComponents(){
-        gameRestartButton = new JButton("Start/Restart (Normal)");
-        gameWithSpecialUnitButton = new JButton("Start/Restart (Special)");
+        gameStartButton = new JButton("Start/Restart (Normal)");
+        gameStartWithSpecialUnitButton = new JButton("Start/Restart (Special)");
         gameForfeitButton = new JButton("Forfeit");
         showScoreButton = new JButton("Display Player Scores");
         undoMoveButton = new JButton("Undo");
         showPlayerTurnButton = new JButton("Current Player Turn:");
         showTotalTurnButton = new JButton("Total Turn:");
 
-        gameRestartButton.addActionListener(new GameRestartListener());
+        gameStartButton.addActionListener(new GameRestartListener());
         gameForfeitButton.addActionListener(new GameForfeitListener());
-        gameWithSpecialUnitButton.addActionListener(new GameStartWithSpecialUnitListener());
+        gameStartWithSpecialUnitButton.addActionListener(new GameStartWithSpecialUnitListener());
         showScoreButton.addActionListener(new ShowScoreListener());
         undoMoveButton.addActionListener(new UndoMoveListener());
     }
@@ -277,9 +277,9 @@ public class ChessView implements ActionListener{
         utilityPanel = new JPanel();
         utilityPanel.setLayout(new BoxLayout(utilityPanel, BoxLayout.Y_AXIS));
         utilityPanel.setPreferredSize(new Dimension(300,1024));
-        utilityPanel.add(gameRestartButton);
+        utilityPanel.add(gameStartButton);
+        utilityPanel.add(gameStartWithSpecialUnitButton);
         utilityPanel.add(gameForfeitButton);
-        utilityPanel.add(gameWithSpecialUnitButton);
         utilityPanel.add(showScoreButton);
         utilityPanel.add(undoMoveButton);
         utilityPanel.add(showPlayerTurnButton);
