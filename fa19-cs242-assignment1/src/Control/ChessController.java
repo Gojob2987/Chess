@@ -7,6 +7,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+import static org.junit.Assert.*;
+
 
 /**
  * Really helpful link for a basic ActionListener implemented in MVC pattern
@@ -39,18 +41,49 @@ public class ChessController {
 
 
     public ChessController() {
-        board = new Board("normal");
-        view = new ChessView();
-        state = GameState.INITIALIZED;
+        gameInit();
     }
 
     /**
      * Can try to start an individual game thread here in furture
      */
+    public static void gameInit(){
+        board = new Board("normal");
+        view = new ChessView();
+        state = GameState.INITIALIZED;
+    }
+
     public static void gameStart() {
         state = GameState.SELECT_SOURCE;
-        player0Score = player1Score = 0;
         view.setShowTurnButton(board.getPlayerTurn());
+    }
+
+    public static void gameRestart(){
+        board = new Board("normal");
+        view.resetView();
+        gameStart();
+    }
+
+    public static void gameOver(String gameOverString) {
+        state = GameState.GAMEOVER;
+        int playerTurn = board.getPlayerTurn();
+        view.spawnGameOverWindow(gameOverString, playerTurn);
+        if (gameOverString.equals("Checkmate") || gameOverString.equals("Forfeit")){
+            switch (playerTurn){ /* current player is Checked by last player, or current player Forfeit*/
+                case 0:
+                    player1Score += 1;
+                    break;
+                case 1:
+                    player0Score += 1;
+                    break;
+                default:
+                    System.out.println("Unknown player number has won: " + (1 - playerTurn));
+            }
+        }
+    }
+
+    public static void gameForfeit(){
+        gameOver("Forfeit");
     }
 
     public static void updateValidMoveOnView() {
@@ -80,6 +113,22 @@ public class ChessController {
             gameStart();
         }
     }
+
+    public static class GameRestartListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            gameRestart();
+        }
+    }
+
+    public static class GameForfeitListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            gameForfeit();
+        }
+    }
+
+
 
     public static class ShowScoreListener implements ActionListener {
         @Override
@@ -136,11 +185,8 @@ public class ChessController {
 
                     state = GameState.SELECT_SOURCE;
                     break;
-
                 default:
-                    /*
-                    System.out.println("current GameState is " + state);
-                     */
+                    System.out.println("current GameState is " + state + ", you cannot move piece.");
             }
 
             if (board.isCheckmate()) {
@@ -162,11 +208,6 @@ public class ChessController {
         }
     }
 
-    public static void gameOver(String gameOverString) {
-        state = GameState.GAMEOVER;
-        int playerTurn = board.getPlayerTurn();
-        view.spawnGameOverWindow(gameOverString, playerTurn);
-    }
 
 
 }

@@ -1,6 +1,5 @@
 package View;
 
-import Control.ChessController;
 import Control.ChessController.*;
 
 import java.awt.*;
@@ -30,51 +29,56 @@ import java.net.URL;
 
 public class ChessView implements ActionListener{
 
-    private ImageIcon BishopDark = createImageIcon("../Asset/Chess_bdt60.png");
-    private ImageIcon PawnDark = createImageIcon("../Asset/Chess_pdt60.png");
-    private ImageIcon KingDark = createImageIcon("../Asset/Chess_kdt60.png");
-    private ImageIcon KnightDark = createImageIcon("../Asset/Chess_ndt60.png");
-    private ImageIcon QueenDark = createImageIcon("../Asset/Chess_qdt60.png");
-    private ImageIcon RookDark = createImageIcon("../Asset/Chess_rdt60.png");
-    private ImageIcon BishopLight = createImageIcon("../Asset/Chess_blt60.png");
-    private ImageIcon PawnLight = createImageIcon("../Asset/Chess_plt60.png");
-    private ImageIcon KingLight = createImageIcon("../Asset/Chess_klt60.png");
-    private ImageIcon KnightLight = createImageIcon("../Asset/Chess_nlt60.png");
-    private ImageIcon QueenLight = createImageIcon("../Asset/Chess_qlt60.png");
-    private ImageIcon RookLight = createImageIcon("../Asset/Chess_rlt60.png");
+    private static ImageIcon BishopDark = createImageIcon("../Asset/Chess_bdt60.png");
+    private static ImageIcon PawnDark = createImageIcon("../Asset/Chess_pdt60.png");
+    private static ImageIcon KingDark = createImageIcon("../Asset/Chess_kdt60.png");
+    private static ImageIcon KnightDark = createImageIcon("../Asset/Chess_ndt60.png");
+    private static ImageIcon QueenDark = createImageIcon("../Asset/Chess_qdt60.png");
+    private static ImageIcon RookDark = createImageIcon("../Asset/Chess_rdt60.png");
+    private static ImageIcon BishopLight = createImageIcon("../Asset/Chess_blt60.png");
+    private static ImageIcon PawnLight = createImageIcon("../Asset/Chess_plt60.png");
+    private static ImageIcon KingLight = createImageIcon("../Asset/Chess_klt60.png");
+    private static ImageIcon KnightLight = createImageIcon("../Asset/Chess_nlt60.png");
+    private static ImageIcon QueenLight = createImageIcon("../Asset/Chess_qlt60.png");
+    private static ImageIcon RookLight = createImageIcon("../Asset/Chess_rlt60.png");
 
+
+    private static JFrame gameWindow;
     private static JPanel mainPanel;
     private static JPanel utilityPanel;
     private static JPanel boardPanel;
-    private static JButton[][] boardTileButtons;
-    private static JButton gameStartButton = new JButton("Game Start");
-    private static JButton showScoreButton = new JButton("Player Scores");
-    private static JButton showTurnButton = new JButton("Current Turn: ");
+    private static JButton[][] boardButtons;
+    private static JButton gameStartButton;
+    private static JButton gameRestartButton;
+    private static JButton gameForfeitButton;
+    private static JButton showScoreButton;
+    private static JButton showTurnButton;
 
 
     public ChessView(){
-        JFrame gameWindow = new JFrame("Chess GUI");
+        initView();
+    }
+
+    public static void initView(){
+        gameWindow = new JFrame("Chess GUI");
+        mainPanel = new JPanel();
+        utilityPanel = new JPanel();
+        boardPanel = new JPanel();
+        boardButtons = new JButton[8][8];
+        gameStartButton = new JButton("Game Start");
+        gameRestartButton = new JButton("Game Restart");
+        gameForfeitButton = new JButton("Game Forfeit");
+        showScoreButton = new JButton("Player Scores");
+        showTurnButton = new JButton("Current Turn: ");
         gameWindow.setSize(1024, 1024);
-        mainPanel = initMainPanel();
-        utilityPanel = initUtilityPanel();
-        boardPanel = initBoardPanel();
+
+        initUtilityButtons();
+        initMainPanel();
+        initUtilityPanel();
+        initBoardPanel();
+        initBoardButtons();
 
         mainPanel.add(utilityPanel, BorderLayout.EAST);
-
-        gameStartButton.addActionListener(new GameStartListener());
-        showScoreButton.addActionListener(new ShowScoreListener());
-
-        boardTileButtons = initBoardTileButtons();
-        for (int i = 0; i < 8; i ++){
-            for (int j = 0; j < 8; j ++){
-                JButton boardTileButton = boardTileButtons[i][j];
-                boardTileButton.setActionCommand("" + i + "," + j);
-                boardTileButton.setText("");
-                boardTileButton.addActionListener(new MovePieceListener());
-                boardPanel.add(boardTileButton);
-            }
-        }
-
         mainPanel.add(boardPanel);
         /* setUpMenu(gameWindow); */
         gameWindow.setContentPane(mainPanel);
@@ -82,12 +86,20 @@ public class ChessView implements ActionListener{
         gameWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    public JButton getBoardTileButton(int row, int col){
-        return boardTileButtons[row][col];
+    public static void resetView(){
+        if (gameWindow.getContentPane() != null) {
+            gameWindow.getContentPane().removeAll();
+        }
+        initView();
+        gameWindow.revalidate();
+    }
+
+    public static JButton getBoardTileButton(int row, int col){
+        return boardButtons[row][col];
     }
 
 
-    public void spawnShowScoreWindow(int player0Score, int player1Score){
+    public static void spawnShowScoreWindow(int player0Score, int player1Score){
         JFrame scoreWindow = new JFrame();
         scoreWindow.setSize(150, 150);
         JPanel scorePanel = new JPanel();
@@ -100,9 +112,9 @@ public class ChessView implements ActionListener{
         scoreWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 
-    public void spawnGameOverWindow(String gameOverTypeString, int playerTurn){
+    public static void spawnGameOverWindow(String gameOverTypeString, int playerTurn){
         JFrame gameOverWindow = new JFrame();
-        gameOverWindow.setSize(150, 150);
+        gameOverWindow.setSize(300, 300);
         JPanel gameOverPanel = new JPanel();
         JLabel gameOverStatementLabel = new JLabel("Game Over! " + gameOverTypeString);
         JLabel gameOverResultLabel = new JLabel();
@@ -111,7 +123,10 @@ public class ChessView implements ActionListener{
                 gameOverResultLabel.setText("Winner: Player" + (1 - playerTurn));
                 break;
             case "Stalemate":
-                gameOverResultLabel.setText("Draw in Stalemate");
+                gameOverResultLabel.setText("Draw: Stalemate");
+                break;
+            case "Forfeit":
+                gameOverResultLabel.setText("Winner: Player" + (1 - playerTurn) + " due to opponent forfeit.");
                 break;
             default:
                 gameOverResultLabel.setText("Unknown end game condition (neither Checkmate nor Stalemate");
@@ -124,25 +139,28 @@ public class ChessView implements ActionListener{
 
     }
 
-    public void setShowTurnButton(int playerTurn){
+    public static void setShowTurnButton(int playerTurn){
         String playerTurnColorString = (playerTurn == 0) ? "B" : "W";
         showTurnButton.setText("Current Turn: " + playerTurn + " (" + playerTurnColorString + ")");
     }
 
-    private JButton[][] initBoardTileButtons(){
-        JButton[][] boardButtons = new JButton[8][8];
+    private static JButton[][] initBoardButtons(){
         for (int i = 0; i < 8; i ++){
             for (int j = 0; j < 8; j ++){
-                JButton tileButton = new JButton();
+                JButton boardButton = new JButton();
                 if (i % 2 == j % 2){
-                    tileButton.setBackground(Color.WHITE);
+                    boardButton.setBackground(Color.WHITE);
                 }
                 else{
-                    tileButton.setBackground(Color.GRAY);
+                    boardButton.setBackground(Color.GRAY);
                 }
-                tileButton.setOpaque(true);
-                tileButton.setBorderPainted(false);
-                boardButtons[i][j] = tileButton;
+                boardButton.setOpaque(true);
+                boardButton.setBorderPainted(false);
+                boardButtons[i][j] = boardButton;
+                boardButton.setActionCommand("" + i + "," + j);
+                boardButton.setText("");
+                boardButton.addActionListener(new MovePieceListener());
+                boardPanel.add(boardButton);
             }
         }
 
@@ -172,8 +190,8 @@ public class ChessView implements ActionListener{
     }
 
     /* Sample code from: https://docs.oracle.com/javase/tutorial/uiswing/components/icon.html*/
-    protected  ImageIcon createImageIcon(String path){
-        URL imgURL = getClass().getResource(path);
+    protected static ImageIcon createImageIcon(String path){
+        URL imgURL = ChessView.class.getResource(path);
         if (imgURL != null){
             return new ImageIcon(imgURL);
         }
@@ -184,32 +202,39 @@ public class ChessView implements ActionListener{
     }
 
 
-    private JPanel initMainPanel() {
-        JPanel mainPanel = new JPanel();
+    private static JPanel initMainPanel() {
         mainPanel.setPreferredSize(new Dimension(1024,1024));
         mainPanel.setLayout(new BorderLayout());
         return mainPanel;
     }
 
-    private JPanel initUtilityPanel(){
-        JPanel utilityPanel = new JPanel();
+    private static void initUtilityButtons(){
+        gameStartButton.addActionListener(new GameStartListener());
+        gameRestartButton.addActionListener(new GameRestartListener());
+        gameForfeitButton.addActionListener(new GameForfeitListener());
+        showScoreButton.addActionListener(new ShowScoreListener());
+    }
+
+
+    private static JPanel initUtilityPanel(){
         utilityPanel.setLayout(new BoxLayout(utilityPanel, BoxLayout.Y_AXIS));
         utilityPanel.setPreferredSize(new Dimension(300,1024));
         utilityPanel.add(gameStartButton);
+        utilityPanel.add(gameRestartButton);
+        utilityPanel.add(gameForfeitButton);
         utilityPanel.add(showScoreButton);
         utilityPanel.add(showTurnButton);
         return utilityPanel;
     }
 
-    private JPanel initBoardPanel(){
-        JPanel boardPanel = new JPanel();
+    private static JPanel initBoardPanel(){
         boardPanel.setLayout(new GridLayout(0, 8));
         return boardPanel;
     }
 
 
 /*
-    private void setUpMenu(JFrame window) {
+    private static void setUpMenu(JFrame window) {
         JMenuBar menubar = new JMenuBar();
         JMenu file = new JMenu("File");
         JMenuItem open = new JMenuItem("Open");

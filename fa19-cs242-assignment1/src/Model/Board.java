@@ -125,6 +125,10 @@ public class Board {
         /*printBoard();*/
     }
 
+    public void resetBoardNormal(){
+        initBoardNormal();
+    }
+
     private void initPlayerPiecesNormal(){
         player0Pieces = new ArrayList<>(16);
         player1Pieces = new ArrayList<>(16);
